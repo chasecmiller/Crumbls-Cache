@@ -23,20 +23,23 @@ class Plugin
     protected $instance = null;
     protected $tags = null;
     protected $expires = -1;
+    protected $config_path = __DIR__.'/config.php';
 
     public function __construct()
     {
-        // Setup File Path on your config files
-        CacheManager::setDefaultConfig([
-            'path' => WP_CONTENT_DIR . '/cache/crumbls/',
-        ]);
-
-        $this->instance = CacheManager::getInstance('files');
+        // Initialize our caching engine.
+        $this->init();
 
         // Break away while possible.
         if (!function_exists('add_action')) {
             return;
         }
+
+        // Handle initialization
+        add_action('init', [$this, 'actionInit']);
+
+        // Updated.
+        add_action('update_option', [$this, 'optionUpdate'], 10, 3);
 
         // Save/Insert post handler. - We ignore this now and just use it when a post is published.
         add_action('wp_insert_post', array(&$this, 'savePost'), PHP_INT_MAX - 1, 3);
@@ -55,10 +58,59 @@ class Plugin
     }
 
     /**
+     * initialize our engine.
+     * @throws \phpFastCache\Exceptions\phpFastCacheDriverCheckException
+     */
+    private function init() {
+        $s = null;
+        if (
+        file_exists($this->config_path)
+            &&
+            is_readable($this->config_path)
+        ) {
+            $s = include($this->config_path);
+        } else {
+//            'path' => WP_CONTENT_DIR . '/cache/crumbls/',
+            $s = [
+                'crumbls_page_cache_type' => 'files',
+                'crumbls_object_cache_type' => 'files',
+                'crumbls_crumblsCache_files' => [
+                    'path' => WP_CONTENT_DIR . '/cache/crumbls/'
+                ]
+            ];
+        }
+
+        // Setup page cache.
+        if (
+            $s['crumbls_page_cache_type']
+            &&
+            array_key_exists('crumbls_crumblsCache_'.$s['crumbls_page_cache_type'], $s)
+        ) {
+            $t = $s['crumbls_crumblsCache_'.$s['crumbls_page_cache_type']];
+
+            // Setup File Path on your config files
+            CacheManager::setDefaultConfig($t);
+            $this->instance = CacheManager::getInstance($s['crumbls_page_cache_type']);
+        }
+
+    }
+
+    /**
+     * initialization handler.
+     */
+    public function actionInit() {
+        if (!file_exists($this->config_path)) {
+            $this->generateConfig();
+        }
+    }
+
+    /**
      * advanced-cache.php handler.
      **/
     public function advancedCache()
     {
+        // Determine if we should load advanced cache.
+
         global $wpdb;
         if (preg_match('#/wp-(admin|login)#', $_SERVER['REQUEST_URI'])) {
             return;
@@ -140,13 +192,14 @@ class Plugin
             if (defined('DOING_CRON') && DOING_CRON) {
                 return;
             }
+
             if (is_admin()) {
                 return;
             }
 
             // This is being called on the front page.  It should not be.
-            if (defined('DONOTCACHEPAGE')) {
-                printf('<!-- %s -->', __('Cache Disabled', __NAMESPACE__));
+            if (defined('DONOTCACHEPAGE') && DONOTCACHEPAGE) {
+                printf('<!-- %s -->', __('Cache Disabled By Constant', __NAMESPACE__));
                 return;
             }
 
@@ -372,20 +425,51 @@ class Plugin
 
         // Category, archive, etc?
         $wp_admin_bar->add_menu([
+            'id' => 'crumbls_cache_all',
             'parent' => 'crumbls_cache',
             'title' => __('Clear all', __NAMESPACE__),
             'href' => admin_url('admin.php?page=cache&action=clearAll&key=' . time())
         ]);
-        /*
-            // Category, archive, etc?
-            $wp_admin_bar->add_menu([
-                'parent' => 'crumbls_cache',
-                'title' => __('Clear all', __NAMESPACE__),
-                'href' => FALSE
-            ]);
-*/
     }
 
+
+    public function objectCache()
+    {
+        // Determine if we should load object cache.
+
+        // Object cache is now online.
+        require_once(dirname(__FILE__) . '/object.php');
+    }
+
+    /**
+     * Handle option update.
+     * @param $key
+     * @param $new
+     * @param $old
+     */
+    public function optionUpdate($key, $new, $old) {
+        if ($key != 'crumbls_settings') {
+            return;
+        }
+        @unlink($this->config_path);
+        $this->generateConfig($new);
+    }
+
+    /**
+     * Generate static configuration file.
+     * @param null $in
+     */
+    protected function generateConfig($in = null) {
+        if (!$in) {
+            $in = get_option('crumbls_settings');
+        }
+        try {
+            file_put_contents(dirname(__FILE__).'/config.php', '<?php return ' . var_export($in, true) . ';');
+        } catch (\Exception $e) {
+            new \WP_Error( 'crumbls_cache', $e->toString() );
+        }
+
+    }
 
 }
 

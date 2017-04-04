@@ -13,7 +13,6 @@ if (!file_exists($file)) {
 }
 	
 require_once($file);
-
 if (!is_admin()) {
 	$cache->advancedCache();
 }
