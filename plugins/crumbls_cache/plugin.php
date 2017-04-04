@@ -2,7 +2,7 @@
 /*
 	Plugin Name: Caching
 	Plugin URI: http://crumbls.com
-	Description: Custom Caching for BizWest.com.  It is designed to cache based on the Paid Memberships Pro paywall level.
+	Description: Caching for WP via PHPFastCache Not for production. Works 100%, just not 100% tested.
 	Author: Chase C. Miller
 	Version: 1.0a
 	Author URI: http://crumbls.com
@@ -26,9 +26,8 @@ class Plugin
 
     public function __construct()
     {
-
         // Setup File Path on your config files
-        CacheManager::setup([
+        CacheManager::setDefaultConfig([
             'path' => WP_CONTENT_DIR . '/cache/crumbls/',
         ]);
 
@@ -50,6 +49,9 @@ class Plugin
 
         // On publish
         add_action('publish_post', [&$this, 'postPublish'], 10, 2);
+
+        // Toolbar
+        add_action('admin_bar_menu', [$this, 'adminToolbar'], 999);
     }
 
     /**
@@ -229,6 +231,7 @@ class Plugin
     {
         return $this->instance;
     }
+
     public function postPublish($ID, $post)
     {
         // A function to perform actions when a post is published.
@@ -352,6 +355,38 @@ class Plugin
     }
 
 
+    // Add Toolbar Menus
+    public function adminToolbar()
+    {
+        global $wp_admin_bar, $wp;
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $wp_admin_bar->add_menu([
+            'id' => 'crumbls_cache',
+            'title' => __('Cache', __NAMESPACE__),
+            'href' => admin_url('options-general.php?page=cache')
+        ]);
+
+        // Category, archive, etc?
+        $wp_admin_bar->add_menu([
+            'parent' => 'crumbls_cache',
+            'title' => __('Clear all', __NAMESPACE__),
+            'href' => admin_url('admin.php?page=cache&action=clearAll&key=' . time())
+        ]);
+        /*
+            // Category, archive, etc?
+            $wp_admin_bar->add_menu([
+                'parent' => 'crumbls_cache',
+                'title' => __('Clear all', __NAMESPACE__),
+                'href' => FALSE
+            ]);
+*/
+    }
+
+
 }
 
 require_once(dirname(__FILE__) . '/assets/php/phpfastcache/src/autoload.php');
@@ -363,6 +398,3 @@ if (is_admin()) {
 } else {
     $cache = new Plugin();
 }
-
-
-

@@ -28,7 +28,7 @@ class Admin extends Plugin
     {
         global $submenu;
 
-        $parent = 'theme-general-settings';
+        $parent = 'options-general.php';
 
         if (!array_key_exists($parent, $submenu)) {
             return;
