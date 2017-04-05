@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d326bda-3e3d-425a-8cc0-486e37643c04" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/object.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" />
     </list>
     <ignored path="Crumbls-Cache.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -42,8 +39,8 @@
       <file leaf-file-name="helpers.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/helpers.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6575875">
-              <caret line="620" column="19" selection-start-line="620" selection-start-column="19" selection-end-line="620" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.4610895">
+              <caret line="525" column="0" selection-start-line="525" selection-start-column="0" selection-end-line="525" selection-end-column="0" />
               <folding>
                 <element signature="e#6#151#0#PHP" expanded="true" />
               </folding>
@@ -483,8 +480,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/helpers.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6575875">
-          <caret line="620" column="19" selection-start-line="620" selection-start-column="19" selection-end-line="620" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.4610895">
+          <caret line="525" column="0" selection-start-line="525" selection-start-column="0" selection-end-line="525" selection-end-column="0" />
           <folding>
             <element signature="e#6#151#0#PHP" expanded="true" />
           </folding>

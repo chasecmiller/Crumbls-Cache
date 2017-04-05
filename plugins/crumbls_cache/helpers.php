@@ -520,6 +520,9 @@ class WP_Object_Cache {
      * @return bool False if the contents weren't deleted and true on success.
      */
     public function delete( $key, $group = 'default', $deprecated = false ) {
+
+        global $cache;
+        return $cache->object()->delete($key);
         echo __FUNCTION__;
         exit;
         if ( empty( $group ) )
