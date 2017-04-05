@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d326bda-3e3d-425a-8cc0-486e37643c04" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
     </list>
     <ignored path="Crumbls-Cache.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -27,8 +30,8 @@
       <file leaf-file-name="plugin.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.5522387">
-              <caret line="224" column="82" selection-start-line="224" selection-start-column="82" selection-end-line="224" selection-end-column="82" />
+            <state vertical-scroll-proportion="-2.880597">
+              <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
               <folding>
                 <element signature="e#6#305#0#PHP" expanded="true" />
               </folding>
@@ -40,7 +43,7 @@
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/helpers.php">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.41828793">
-              <caret line="524" column="43" selection-start-line="524" selection-start-column="43" selection-end-line="524" selection-end-column="43" />
+              <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
               <folding>
                 <element signature="e#6#151#0#PHP" expanded="true" />
               </folding>
@@ -52,7 +55,7 @@
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="-2.5522387">
-              <caret line="330" column="0" selection-start-line="330" selection-start-column="0" selection-end-line="330" selection-end-column="0" />
+              <caret line="49" column="33" selection-start-line="49" selection-start-column="31" selection-end-line="49" selection-end-column="33" />
               <folding>
                 <element signature="e#6#43#0#PHP" expanded="true" />
               </folding>
@@ -458,22 +461,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
+    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.5522387">
-          <caret line="224" column="82" selection-start-line="224" selection-start-column="82" selection-end-line="224" selection-end-column="82" />
+          <caret line="49" column="33" selection-start-line="49" selection-start-column="31" selection-end-line="49" selection-end-column="33" />
           <folding>
-            <element signature="e#6#305#0#PHP" expanded="true" />
+            <element signature="e#6#43#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
+    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.5522387">
-          <caret line="330" column="0" selection-start-line="330" selection-start-column="0" selection-end-line="330" selection-end-column="0" />
+        <state vertical-scroll-proportion="-2.880597">
+          <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
           <folding>
-            <element signature="e#6#43#0#PHP" expanded="true" />
+            <element signature="e#6#305#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -481,7 +484,7 @@
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/helpers.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.41828793">
-          <caret line="524" column="43" selection-start-line="524" selection-start-column="43" selection-end-line="524" selection-end-column="43" />
+          <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
           <folding>
             <element signature="e#6#151#0#PHP" expanded="true" />
           </folding>

@@ -38,21 +38,12 @@ class Admin extends Plugin
         );
 
         add_settings_field(
-            'crumbls_page_cache_type',
-            __('Page caching type', __NAMESPACE__),
+            'crumbls_cache_type',
+            __('Cache Type', __NAMESPACE__),
             [$this, 'renderFieldCacheType'],
             'crumblsCache',
             'crumbls_crumblsCache_general',
-            ['field' => 'crumbls_page_cache_type']
-        );
-
-        add_settings_field(
-            'crumbls_object_cache_type',
-            __('Object caching type ( NOT IMPLEMENTED )', __NAMESPACE__),
-            [$this, 'renderFieldCacheType'],
-            'crumblsCache',
-            'crumbls_crumblsCache_general',
-            ['field' => 'crumbls_object_cache_type']
+            ['field' => 'crumbls_cache_type']
         );
 
         // Ugly, but it works for now.
@@ -208,7 +199,9 @@ class Admin extends Plugin
             // How to stop someone from just hitting refresh and retriggering?
             switch ($_REQUEST['action']) {
                 case 'clearAll':
-                    $this->instance->clear();
+                    if ($this->instance) {
+                        $this->instance->clear();
+                    }
                     break;
                 case 'clearFrontpage':
                     $this->delete('/', ['/']);
@@ -256,7 +249,7 @@ class Admin extends Plugin
 
             $url = admin_url('admin.php?page=cache&action=clearFrontpage&key=' . time());
 
-            if ($this->instance->hasItem('/')) {
+            if ($this->instance && $this->instance->hasItem('/')) {
                 // Exists
                 printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
             } else {

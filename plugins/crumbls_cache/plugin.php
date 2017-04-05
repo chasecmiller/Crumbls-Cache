@@ -23,8 +23,7 @@ class Plugin
     protected $instance = null;
     protected $tags = null;
     protected $expires = -1;
-    protected $config_path = __DIR__.'/config.php';
-    protected $object = null;
+    protected $config_path = __DIR__ . '/config.php';
 
     public function __construct()
     {
@@ -62,18 +61,19 @@ class Plugin
      * initialize our engine.
      * @throws \phpFastCache\Exceptions\phpFastCacheDriverCheckException
      */
-    private function init() {
+    private function init()
+    {
         $s = null;
+
         if (
-        file_exists($this->config_path)
+            file_exists($this->config_path)
             &&
             is_readable($this->config_path)
         ) {
             $s = include($this->config_path);
         } else {
             $s = [
-                'crumbls_page_cache_type' => 'files',
-                'crumbls_object_cache_type' => 'files',
+                'crumbls_cache_type' => 'files',
                 'crumbls_crumblsCache_files' => [
                     'path' => WP_CONTENT_DIR . '/cache/crumbls/'
                 ]
@@ -82,34 +82,25 @@ class Plugin
 
         // Setup page cache.
         if (
-            $s['crumbls_page_cache_type']
+            array_key_exists('crumbls_cache_type', $s)
             &&
-            array_key_exists('crumbls_crumblsCache_'.$s['crumbls_page_cache_type'], $s)
+            $s['crumbls_cache_type']
+            &&
+            array_key_exists('crumbls_crumblsCache_' . $s['crumbls_cache_type'], $s)
         ) {
-            $t = $s['crumbls_crumblsCache_'.$s['crumbls_page_cache_type']];
-
+            $t = $s['crumbls_crumblsCache_' . $s['crumbls_cache_type']];
             // Setup File Path on your config files
             CacheManager::setDefaultConfig($t);
-            $this->instance = CacheManager::getInstance($s['crumbls_page_cache_type']);
+            $this->instance = CacheManager::getInstance($s['crumbls_cache_type']);
         }
 
-        if (
-            $s['crumbls_object_cache_type']
-            &&
-            array_key_exists('crumbls_crumblsCache_'.$s['crumbls_object_cache_type'], $s)
-        ) {
-            $t = $s['crumbls_crumblsCache_'.$s['crumbls_object_cache_type']];
-
-            // Setup File Path on your config files
-            CacheManager::setDefaultConfig($t);
-            $this->object = CacheManager::getInstance($s['crumbls_object_cache_type']);
-        }
     }
 
     /**
      * initialization handler.
      */
-    public function actionInit() {
+    public function actionInit()
+    {
         if (!file_exists($this->config_path)) {
             $this->generateConfig();
         }
@@ -240,6 +231,10 @@ class Plugin
      **/
     public function read($key)
     {
+        if (!$this->instance) {
+            return false;
+        }
+
         if ($ret = $this->instance->getItem($key)) {
             return $ret->get();
         }
@@ -258,6 +253,9 @@ class Plugin
      **/
     public function add($key, $value, $tags = null, $expires = -1)
     {
+        if (!$this->instance) {
+            return false;
+        }
         $CachedString = $this->instance->getItem($key);
         $CachedString->set($value);
         if ($tags) {
@@ -274,6 +272,9 @@ class Plugin
      **/
     public function delete($key = null, $tags = null)
     {
+        if (!$this->instance) {
+            return;
+        }
         // Easy way to clean up key or tags.
         if ($key) {
             //echo $key;
@@ -458,7 +459,8 @@ class Plugin
      * @param $new
      * @param $old
      */
-    public function optionUpdate($key, $new, $old) {
+    public function optionUpdate($key, $new, $old)
+    {
         if ($key != 'crumbls_settings') {
             return;
         }
@@ -470,25 +472,20 @@ class Plugin
      * Generate static configuration file.
      * @param null $in
      */
-    protected function generateConfig($in = null) {
+    protected function generateConfig($in = null)
+    {
         if (!$in) {
             $in = get_option('crumbls_settings');
         }
+
         try {
-            file_put_contents(dirname(__FILE__).'/config.php', '<?php return ' . var_export($in, true) . ';');
+            file_put_contents(dirname(__FILE__) . '/config.php', '<?php return ' . var_export($in, true) . ';');
         } catch (\Exception $e) {
-            new \WP_Error( 'crumbls_cache', $e->toString() );
+            new \WP_Error('crumbls_cache', $e->toString());
         }
 
     }
 
-    /**
-     * Handler for object cache.
-     * @return null
-     */
-    public function object() {
-        return $this->object;
-    }
 }
 
 require_once(dirname(__FILE__) . '/assets/php/phpfastcache/src/autoload.php');
