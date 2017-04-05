@@ -10,4 +10,5 @@ Default caching is file.  Options -> Cache.
 
 Thanks to:
 @mxmkmarquette for helping with memcache testing.
+
 https://www.facebook.com/groups/advancedwp/ for providing a place for Q&A for advanced WordPress topics.
