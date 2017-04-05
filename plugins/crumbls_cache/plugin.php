@@ -180,6 +180,7 @@ class Plugin
         $storage = $this->read(cache_key);
 
         if ($storage) {
+            echo 'a';
             echo $storage;
             printf('<!-- Cache: %s -->', cache_key);
             exit(1);
@@ -200,6 +201,7 @@ class Plugin
             if (is_admin()) {
                 return;
             }
+
 
             // This is being called on the front page.  It should not be.
             if (defined('DONOTCACHEPAGE') && DONOTCACHEPAGE) {

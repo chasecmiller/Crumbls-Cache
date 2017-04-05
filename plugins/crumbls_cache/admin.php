@@ -142,6 +142,7 @@ class Admin extends Plugin
             [
                 'field' => 'crumbls_crumblsCache_memcached',
                 'default' => [
+                    'user' => '',
                     'host' => '',
                     'port' => ''
                 ]

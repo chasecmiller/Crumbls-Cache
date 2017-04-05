@@ -75,7 +75,6 @@ class Driver extends DriverAbstract
             if ($ttl > 2592000) {
                 $ttl = time() + $ttl;
             }
-
             return $this->instance->set($item->getKey(), $this->driverPreWrap($item), $ttl);
         } else {
             throw new \InvalidArgumentException('Cross-Driver type confusion detected');
