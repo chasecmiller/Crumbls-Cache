@@ -27,6 +27,7 @@ class Plugin
 
     public function __construct()
     {
+//        return;
         // Initialize our caching engine.
         $this->init();
 
@@ -71,7 +72,9 @@ class Plugin
             is_readable($this->config_path)
         ) {
             $s = include($this->config_path);
-        } else {
+        }
+
+        if (!is_array($s)) {
             $s = [
                 'crumbls_cache_type' => 'files',
                 'crumbls_crumblsCache_files' => [
@@ -93,7 +96,6 @@ class Plugin
             CacheManager::setDefaultConfig($t);
             $this->instance = CacheManager::getInstance($s['crumbls_cache_type']);
         }
-
     }
 
     /**
@@ -235,6 +237,13 @@ class Plugin
             return false;
         }
 
+        if (!in_array($key, [
+            'is_blogged_installed'
+        ])) {
+            return false;
+        }
+        echo "<br>\r\nKEY:".$key."<br />\r\n";
+
         if ($ret = $this->instance->getItem($key)) {
             return $ret->get();
         }
@@ -244,8 +253,52 @@ class Plugin
     /**
      * (e)dit
      **/
-    public function edit($key, $value)
+    public function edit($key, $value, $tags, $expires)
     {
+        return $this->add($key,$value,$tags,$expires);
+    }
+
+    /**
+     * (e)dit Decrease
+     */
+    public function editDecrease($key, $value, $tags) {
+        if (!$this->instance) {
+            return false;
+        }
+        if (is_string($tags)) {
+            $tags = [$tags];
+        }
+
+        $CachedString = $this->instance->getItem($key);
+        if (!$CachedString) {
+            return false;
+        }
+
+        $CachedString->get()->decrement((int)$value);
+
+        $this->instance->save($CachedString);
+    }
+
+
+    /**
+     * (e)dit Increase
+     */
+    public function editIncrease($key, $value, $tags) {
+        if (!$this->instance) {
+            return false;
+        }
+        if (is_string($tags)) {
+            $tags = [$tags];
+        }
+
+        $CachedString = $this->instance->getItem($key);
+        if (!$CachedString) {
+            return false;
+        }
+
+        $CachedString->get()->increment((int)$value);
+
+        $this->instance->save($CachedString);
     }
 
     /**
@@ -255,6 +308,9 @@ class Plugin
     {
         if (!$this->instance) {
             return false;
+        }
+        if (is_string($tags)) {
+            $tags = [$tags];
         }
         $CachedString = $this->instance->getItem($key);
         $CachedString->set($value);
@@ -286,7 +342,26 @@ class Plugin
             }
             $this->instance->deleteItemsByTags($tags);
         }
+    }
 
+    /**
+     * Flush cache
+     */
+    public function flush() {
+        if (!$this->instance) {
+            return;
+        }
+        return $this->instance->flush();
+    }
+
+    /**
+     * Output statistics
+     */
+    public function getStats() {
+        if (!$this->instance) {
+            return;
+        }
+        return $this->instance->getStats();
     }
 
     /**
@@ -442,15 +517,6 @@ class Plugin
             'title' => __('Clear all', __NAMESPACE__),
             'href' => admin_url('admin.php?page=cache&action=clearAll&key=' . time())
         ]);
-    }
-
-
-    public function objectCache()
-    {
-        // Determine if we should load object cache.
-
-        // Object cache is now online.
-        require_once(dirname(__FILE__) . '/helpers.php');
     }
 
     /**

@@ -46,6 +46,25 @@ class Admin extends Plugin
             ['field' => 'crumbls_cache_type']
         );
 
+        add_settings_field(
+            'crumbls_cache_type_object',
+            __('Object Cache Type', __NAMESPACE__),
+            [$this, 'renderFieldCacheType'],
+            'crumblsCache',
+            'crumbls_crumblsCache_general',
+            ['field' => 'crumbls_cache_type_object']
+        );
+
+        add_settings_field(
+            'crumbls_cache_type_transients',
+            __('Transient Cache Type', __NAMESPACE__),
+            [$this, 'renderFieldCacheType'],
+            'crumblsCache',
+            'crumbls_crumblsCache_general',
+            ['field' => 'crumbls_cache_type_transients']
+        );
+
+
         // Ugly, but it works for now.
         $possible = $this->getSupported();
         unset($possible['']);
@@ -212,21 +231,16 @@ class Admin extends Plugin
 
         $path = false;
 
-        if (preg_match('#"path":"(.*?)"#', json_encode((array)$this->instance), $path)) {
-            $path = stripslashes($path[1]);
+//        print_r($this->getStats());
 
-            $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
-            $temp = [];
-            $i = 0;
-            foreach ($objects as $name => $object) {
-                $temp[] = $name;//rtrim($name, '/.');
-            }
+//print_r();
 
-            $folders = array_map(function ($e) {
-                return rtrim($e, '/.');
-            }, preg_grep('#\/\.$#', $temp));
-            $files = array_diff(preg_grep('#.*\/\.?.*?\.\w+$#', $temp), $folders);
+        $files = $this->getStats()->getInfo();
+
+        if (preg_match('#: (\d+)#', $files, $m)) {
+            $files = $m[1];
         }
+
         ?>
         <div class="wrap">
             <h1><?php _e('Cache', __NAMESPACE__); ?></h1>
@@ -235,7 +249,7 @@ class Admin extends Plugin
             <p>It's only going to do it's job.  If you want to merge, minify, etc, that's not this plugin's job.</p>
             <p>Please send any feedback to chase@crumbls.com or https://github.com/chasecmiller/Crumbls-Cache</p>
             <?php
-            printf('<p>Cached entries: %d</p>', sizeof($files));
+            printf('<p>Cached entries: %d</p>', $files);
 
             $url = admin_url('admin.php?page=cache&action=clearAll&key=' . time());
             if ($files) {
@@ -310,7 +324,13 @@ class Admin extends Plugin
             return;
         }
 
+
         $possible = $this->getSupported();
+        if ($a['field'] == 'crumbls_cache_type_object') {
+            $possible[''] = __('Inherit', __NAMESPACE__);
+        } else if ($a['field'] == 'crumbls_cache_type_transients') {
+            $possible[''] = __('Inherit', __NAMESPACE__);
+        }
 
         echo '<select name="crumbls_settings[' . $a['field'] . ']">';
         foreach ($possible as $k => $v) {
