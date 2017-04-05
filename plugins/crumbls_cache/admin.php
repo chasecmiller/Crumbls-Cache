@@ -93,7 +93,7 @@ class Admin extends Plugin
         // File settings
         add_settings_field(
             'crumbls_crumblsCache_files',
-            __('Settings field description', __NAMESPACE__),
+            __('File Settings', __NAMESPACE__),
             [$this, 'renderFieldTextDump'],
             'crumblsCache',
             'crumbls_crumblsCache_files',
@@ -297,7 +297,8 @@ class Admin extends Plugin
         if (method_exists($this, $method)) {
             call_user_func([$this, $method], $a);
         } else {
-            echo $method;
+            printf('<p>%s</p>', __('Not yet supported', __NAMESPACE__));
+//            echo $method;
         }
     }
 
@@ -327,7 +328,6 @@ class Admin extends Plugin
             );
         }
         echo '</select>';
-//        print_r($options);
     }
 
     public function renderFieldTextDump($a = null)
@@ -375,8 +375,8 @@ class Admin extends Plugin
      */
     protected function _crumblsCache_files($a)
     {
-        printf('<p>%s</p>', __('Settings related to file based caching', __NAMESPACE__));
-        printf('<p>%s</p>', __('The path is not verified.  You need to verify it right now for security reasons.', __NAMESPACE__));
+        printf('<p>%s</p>', __('A file driver that use serialization for storing data for regular performances. A path must be specified, else the system temporary directory will be used.', __NAMESPACE__));
+        printf('<p>%s</p>', __('The path is not yet verified.  You need to verify it right now for security reasons.', __NAMESPACE__));
     }
 
     /**

@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d326bda-3e3d-425a-8cc0-486e37643c04" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/object.php" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/final.zip" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/object.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/advanced-cache.php" afterPath="$PROJECT_DIR$/advanced-cache.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/object-cache.php" afterPath="$PROJECT_DIR$/object-cache.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
     </list>
@@ -30,21 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="advanced-cache.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/advanced-cache.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.0615387">
-              <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="plugin.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="-2.5522387">
-              <caret line="437" column="51" selection-start-line="437" selection-start-column="39" selection-end-line="437" selection-end-column="51" />
+              <caret line="224" column="82" selection-start-line="224" selection-start-column="82" selection-end-line="224" selection-end-column="82" />
               <folding>
                 <element signature="e#6#305#0#PHP" expanded="true" />
               </folding>
@@ -52,24 +39,36 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Driver.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcache/Driver.php">
+      <file leaf-file-name="helpers.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/helpers.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.7462687">
-              <caret line="166" column="8" selection-start-line="166" selection-start-column="8" selection-end-line="166" selection-end-column="8" />
-              <folding />
+            <state vertical-scroll-proportion="0.6575875">
+              <caret line="620" column="19" selection-start-line="620" selection-start-column="19" selection-end-line="620" selection-end-column="19" />
+              <folding>
+                <element signature="e#6#151#0#PHP" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="admin.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="admin.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33268481">
-              <caret line="50" column="55" selection-start-line="50" selection-start-column="55" selection-end-line="50" selection-end-column="55" />
+            <state vertical-scroll-proportion="-2.5522387">
+              <caret line="330" column="0" selection-start-line="330" selection-start-column="0" selection-end-line="330" selection-end-column="0" />
               <folding>
                 <element signature="e#6#43#0#PHP" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DRIVERS.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/docs/DRIVERS.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-11.0">
+              <caret line="17" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -104,10 +103,11 @@
       <list>
         <option value="$PROJECT_DIR$/plugins/crumbls_cache/assets/object.php" />
         <option value="$PROJECT_DIR$/object-cache.php" />
-        <option value="$PROJECT_DIR$/plugins/crumbls_cache/object.php" />
         <option value="$PROJECT_DIR$/advanced-cache.php" />
-        <option value="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
+        <option value="$PROJECT_DIR$/plugins/crumbls_cache/object.php" />
         <option value="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
+        <option value="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
+        <option value="$PROJECT_DIR$/plugins/crumbls_cache/helpers.php" />
       </list>
     </option>
   </component>
@@ -183,6 +183,32 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="crumbls_cache" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Crumbls-Cache" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Crumbls-Cache" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="plugins" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="crumbls_cache" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="assets" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="php" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -369,26 +395,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/object-cache.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.725">
-          <caret line="17" column="22" selection-start-line="17" selection-start-column="22" selection-end-line="17" selection-end-column="22" />
-          <folding>
-            <element signature="e#6#58#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/object.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.51361865">
-          <caret line="173" column="0" selection-start-line="173" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
-          <folding>
-            <element signature="e#6#151#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/ExtendedCacheItemPoolTrait.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.5522387">
@@ -421,26 +427,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/docs/DRIVERS.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-11.0">
+          <caret line="17" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcache/Driver.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.7462687">
-          <caret line="166" column="8" selection-start-line="166" selection-start-column="8" selection-end-line="166" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.52918285">
+          <caret line="170" column="58" selection-start-line="170" selection-start-column="56" selection-end-line="170" selection-end-column="58" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/advanced-cache.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.0615387">
+        <state vertical-scroll-proportion="0.5116279">
           <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/object-cache.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.32">
+          <caret line="8" column="42" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="42" />
+          <folding>
+            <element signature="e#6#58#0#PHP" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.5522387">
-          <caret line="437" column="51" selection-start-line="437" selection-start-column="39" selection-end-line="437" selection-end-column="51" />
+          <caret line="224" column="82" selection-start-line="224" selection-start-column="82" selection-end-line="224" selection-end-column="82" />
           <folding>
             <element signature="e#6#305#0#PHP" expanded="true" />
           </folding>
@@ -449,10 +473,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33268481">
-          <caret line="50" column="55" selection-start-line="50" selection-start-column="55" selection-end-line="50" selection-end-column="55" />
+        <state vertical-scroll-proportion="-2.5522387">
+          <caret line="330" column="0" selection-start-line="330" selection-start-column="0" selection-end-line="330" selection-end-column="0" />
           <folding>
             <element signature="e#6#43#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/helpers.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6575875">
+          <caret line="620" column="19" selection-start-line="620" selection-start-column="19" selection-end-line="620" selection-end-column="19" />
+          <folding>
+            <element signature="e#6#151#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>

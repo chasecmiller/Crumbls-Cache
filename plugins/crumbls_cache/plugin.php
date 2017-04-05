@@ -24,6 +24,7 @@ class Plugin
     protected $tags = null;
     protected $expires = -1;
     protected $config_path = __DIR__.'/config.php';
+    protected $object = null;
 
     public function __construct()
     {
@@ -70,7 +71,6 @@ class Plugin
         ) {
             $s = include($this->config_path);
         } else {
-//            'path' => WP_CONTENT_DIR . '/cache/crumbls/',
             $s = [
                 'crumbls_page_cache_type' => 'files',
                 'crumbls_object_cache_type' => 'files',
@@ -93,6 +93,17 @@ class Plugin
             $this->instance = CacheManager::getInstance($s['crumbls_page_cache_type']);
         }
 
+        if (
+            $s['crumbls_object_cache_type']
+            &&
+            array_key_exists('crumbls_crumblsCache_'.$s['crumbls_object_cache_type'], $s)
+        ) {
+            $t = $s['crumbls_crumblsCache_'.$s['crumbls_object_cache_type']];
+
+            // Setup File Path on your config files
+            CacheManager::setDefaultConfig($t);
+            $this->object = CacheManager::getInstance($s['crumbls_object_cache_type']);
+        }
     }
 
     /**
@@ -438,7 +449,7 @@ class Plugin
         // Determine if we should load object cache.
 
         // Object cache is now online.
-        require_once(dirname(__FILE__) . '/object.php');
+        require_once(dirname(__FILE__) . '/helpers.php');
     }
 
     /**
@@ -471,6 +482,13 @@ class Plugin
 
     }
 
+    /**
+     * Handler for object cache.
+     * @return null
+     */
+    public function object() {
+        return $this->object;
+    }
 }
 
 require_once(dirname(__FILE__) . '/assets/php/phpfastcache/src/autoload.php');
