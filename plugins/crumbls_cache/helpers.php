@@ -522,7 +522,7 @@ class WP_Object_Cache {
     public function delete( $key, $group = 'default', $deprecated = false ) {
 
         global $cache;
-        return $cache->object()->delete($key);
+        return $cache->object()->deleteItem($key);
         echo __FUNCTION__;
         exit;
         if ( empty( $group ) )
