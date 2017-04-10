@@ -1,0 +1,20 @@
+.crumbls-tabs .nav-tab {
+    margin-bottom: 0;
+}
+.crumbls-tabs ul > .nav-tab:first-child {
+    margin-left: 0;
+}
+.crumbls-tabs .nav-tab a {
+    color: #000;
+    text-decoration: none;
+    outline: none !important;
+}
+
+.crumbls-tabs .ui-tabs-panel {
+    padding: 0.9357em;
+    clear: both;
+    border: 1px solid rgba(0,0,0,0.25);
+}
+.crumbls-tabs .ui-tabs-panel .form-table {
+    margin-top: 0;
+}

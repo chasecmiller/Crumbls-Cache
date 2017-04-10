@@ -19,6 +19,8 @@ class Admin extends Plugin
 
         add_action('admin_init', [$this, 'actionAdminInit']);
         add_action('admin_menu', [&$this, 'actionAdminMenu'], PHP_INT_MAX - 1);
+
+        add_action('admin_enqueue_scripts', [$this, 'actionAdminEnqueue']);
     }
 
     /**
@@ -26,6 +28,8 @@ class Admin extends Plugin
      */
     public function actionAdminInit()
     {
+
+        // If wea re
 
         register_setting('crumblsCache', 'crumbls_settings');
 
@@ -38,12 +42,15 @@ class Admin extends Plugin
         );
 
         add_settings_field(
-            'crumbls_cache_type',
-            __('Cache Type', __NAMESPACE__),
+            'crumbls_cache_type_page',
+            __('Page Cache Type', __NAMESPACE__),
             [$this, 'renderFieldCacheType'],
             'crumblsCache',
             'crumbls_crumblsCache_general',
-            ['field' => 'crumbls_cache_type']
+            [
+                'field' => 'crumbls_cache_type_page',
+                'show_tab' => true
+            ]
         );
 
         add_settings_field(
@@ -52,7 +59,10 @@ class Admin extends Plugin
             [$this, 'renderFieldCacheType'],
             'crumblsCache',
             'crumbls_crumblsCache_general',
-            ['field' => 'crumbls_cache_type_object']
+            [
+                'field' => 'crumbls_cache_type_object',
+                'show_tab' => true
+            ]
         );
 
         add_settings_field(
@@ -61,7 +71,10 @@ class Admin extends Plugin
             [$this, 'renderFieldCacheType'],
             'crumblsCache',
             'crumbls_crumblsCache_general',
-            ['field' => 'crumbls_cache_type_transients']
+            [
+                'field' => 'crumbls_cache_type_transients',
+                'show_tab' => true
+            ]
         );
 
 
@@ -153,6 +166,26 @@ class Admin extends Plugin
 
     }
 
+    public function actionAdminEnqueue()
+    {
+        global $current_screen;
+        wp_register_style('crumbls-admin', plugins_url('/assets/css/plugin.css', __FILE__));
+        wp_register_script('crumbls-admin', plugins_url('/assets/js/plugin.js', __FILE__), ['jquery-ui-tabs']);
+
+        if (!$current_screen
+            ||
+            !in_array($current_screen->base, [
+                'settings_page_cache'
+            ])
+        ) {
+            return;
+        }
+
+        wp_enqueue_script('crumbls-admin');
+        wp_enqueue_style('crumbls-admin');
+    }
+
+
     /**
      * Handles action admin_menu
      * Setup submenu
@@ -173,7 +206,7 @@ class Admin extends Plugin
     protected function getSupported()
     {
         $possible = [
-            '' => __('Disabled', __NAMESPACE__),
+            false => __('Disabled', __NAMESPACE__),
             'apc' => __('APC', __NAMESPACE__),
             'apcu' => __('APCU', __NAMESPACE__),
             'couchbase' => __('Couchbase', __NAMESPACE__),
@@ -202,6 +235,9 @@ class Admin extends Plugin
      */
     public function pageCache()
     {
+        // Yeah, we do it wrong.
+        global $wp_settings_fields, $wp_settings_sections;
+
         if (!current_user_can('manage_options')) {
             return;
         }
@@ -236,7 +272,7 @@ class Admin extends Plugin
 
 //print_r();
 
-        $files = $this->getStats()->getInfo();
+        $files = ($this->instance) ? $files = $this->getStats()->getInfo() : '';
 
         if (preg_match('#: (\d+)#', $files, $m)) {
             $files = $m[1];
@@ -246,9 +282,12 @@ class Admin extends Plugin
         <div class="wrap">
             <h1><?php _e('Cache', __NAMESPACE__); ?></h1>
             <p>Thanks for trying this plugin out.</p>
-            <p>It's important to remember that it is in early alpha stages and is designed to provided a platform to grow on.</p>
-            <p>It's only going to do it's job.  If you want to merge, minify, etc, that's not this plugin's job.</p>
+            <p>It's important to remember that it is in early alpha stages and is designed to provided a platform to
+                grow on.</p>
+            <p>It's only going to do it's job. If you want to merge, minify, etc, that's not this plugin's job.</p>
             <p>Please send any feedback to chase@crumbls.com or https://github.com/chasecmiller/Crumbls-Cache</p>
+
+
             <?php
             printf('<p>Cached entries: %d</p>', $files);
 
@@ -275,14 +314,110 @@ class Admin extends Plugin
         </div>
         <?php
 
+        $fields = array_filter($wp_settings_fields['crumblsCache']['crumbls_crumblsCache_general'],
+            function ($e) {
+                return array_key_exists('args', $e)
+                && array_key_exists('show_tab', $e['args'])
+                && $e['args']['show_tab'];
+            });
+
         ?>
         <form action='options.php' method='post'>
 
             <h2>Crumbls Cache</h2>
 
+            <div class="crumbls-tabs">
+                <ul>
+                    <?php
+                    $i = 0;
+                    foreach ($fields as $k => $v) {
+                        printf('<li class="nav-tab%s"><a href="#%s">%s</a></li>',
+                            $i == 0 ? ' nav-tab-active' : '',
+                            $k,
+                            $v['title']
+                        );
+                        $i++;
+                    }
+                    ?>
+                </ul>
+                <?php
+                $possible = $this->getSupported();
+                $options = get_option('crumbls_settings');
+
+                //                print_r($options);
+
+                foreach ($fields as $k => $v) {
+                    printf('<div id="%s" class="ui-tabs-panel">', $k);
+
+                    echo '<table class="form-table"><tbody>';
+                    echo '<tr>';
+                    printf('<th>%s</th>', $v['title']);
+                    echo '<td>';
+                    // Show all
+                    printf('<select name="crumbls_settings[%s][type]" id="%s">',
+                        $k,
+                        $k
+                    );
+
+                    if ($k == 'crumbls_cache_type_object') {
+                        if (
+                            !array_key_exists($k, $options)
+                            ||
+                            !array_key_exists('type', $options[$k])
+                        ) {
+                            $options[$k] = [
+                                'value' => 'crumbls_cache_type_page'
+                            ];
+                        }
+                        printf('<option value="crumbls_cache_type_page" %s>%s</option>',
+                            selected($options[$k]['type'], 'crumbls_cache_type_page', false),
+                            __('Inherit from Page Cache', __NAMESPACE__)
+                        );
+                    } else if ($k == 'crumbls_cache_type_transients') {
+                        if (
+                            !array_key_exists($k, $options)
+                            ||
+                            !array_key_exists('type', $options[$k])
+                        ) {
+                            $options[$k] = [
+                                'value' => 'crumbls_cache_type_object'
+                            ];
+                        }
+                        printf('<option value="crumbls_cache_type_page" %s>%s</option>',
+                            selected($options[$k]['type'], 'crumbls_cache_type_page', false),
+                            __('Inherit from Page Cache', __NAMESPACE__)
+                        );
+                        printf('<option value="crumbls_cache_type_object" %s>%s</option>',
+                            selected($options[$k]['type'], 'crumbls_cache_type_object', false),
+                            __('Inherit from Object Cache', __NAMESPACE__)
+                        );
+                    }
+
+                    foreach ($possible as $key => $val) {
+                        printf('<option value="%s" %s>%s</option>',
+                            $key,
+                            selected($options[$k]['type'], $key, false),
+                            $val
+                        );
+                    }
+
+                    for ($i = 0; $i < 10; $i++) {
+                    }
+                    echo '</select>';
+
+                    echo '</td>';
+                    echo '</tr>';
+
+                    call_user_func($v['callback'], $v['args']);
+
+                    echo '</tbody></table>';
+                    echo '</div>';
+                }
+                ?>
+            </div>
             <?php
             settings_fields('crumblsCache');
-            do_settings_sections('crumblsCache');
+            //            do_settings_sections('crumblsCache');
             submit_button();
             ?>
 
@@ -306,7 +441,6 @@ class Admin extends Plugin
             call_user_func([$this, $method], $a);
         } else {
             printf('<p>%s</p>', __('Not yet supported', __NAMESPACE__));
-//            echo $method;
         }
     }
 
@@ -316,32 +450,39 @@ class Admin extends Plugin
      */
     public function renderFieldCacheType($a = null)
     {
-        $options = get_option('crumbls_settings');
-        if (!$a) {
-            $a = [];
-        }
-
-        if (!array_key_exists('field', $a) || !$a['field']) {
+        if (!$a || !array_key_exists('field', $a)) {
             return;
         }
 
+        $options = get_option('crumbls_settings');
 
-        $possible = $this->getSupported();
-        if ($a['field'] == 'crumbls_cache_type_object') {
-            $possible[''] = __('Inherit', __NAMESPACE__);
-        } else if ($a['field'] == 'crumbls_cache_type_transients') {
-            $possible[''] = __('Inherit', __NAMESPACE__);
+        if (!array_key_exists($a['field'], $options)) {
+            $options[$a['field']] = [];
         }
 
-        echo '<select name="crumbls_settings[' . $a['field'] . ']">';
-        foreach ($possible as $k => $v) {
-            printf('<option value="%s" %s>%s</option>',
-                $k,
-                selected($options[$a['field']], $k),
-                htmlentities($v)
+        $ref = $options[$a['field']];
+
+        foreach ([
+                     'compress_data' => 'memcache',
+                     'ip' => 'memcache memcached',
+                     'path' => 'files',
+                     'sasl_user' => 'memcache memcached',
+                     'sasl_password' => 'memcache memcached',
+                     'host' => 'memcache memcached mongodb',
+                     'port' => 'memcache memcached mongodb',
+                     'username' => 'mongodb',
+                     'password' => 'mongodb',
+                     'timeout' => 'mongodb',
+
+                 ] as $field => $class) {
+            printf('<tr class="field hidden %s"><th>%s</th><td><input type="text" name="%s" value="%s" /></td></tr>',
+                $class,
+                __($field, __NAMESPACE__),
+                $field,
+                array_key_exists($field, $ref) ? esc_attr($ref['field']) : ''
             );
         }
-        echo '</select>';
+        return;
     }
 
     public function renderFieldTextDump($a = null)
@@ -358,13 +499,31 @@ class Admin extends Plugin
             array_filter($options[$a['field']])
         );
 
+        ?>
+        <div id="list-A">
+            <ul class="sortable">
+                <li>item 1</li>
+                <li>item 2</li>
+                <li>item 3</li>
+            </ul>
+        </div>
+        <br/>
+        <div id="list-B">
+            <ul class="sortable">
+                <li>item 4</li>
+                <li>item 5</li>
+                <li>item 6</li>
+            </ul>
+        </div>
+        <?php
+
         echo '<table class="form-table"><tbody>';
 
         foreach ($options[$a['field']] as $k => $v) {
             printf('<tr><th scope="row">%s</th><td><input name="crumbls_settings[%s][%s]" value="%s" placeholder="%s" /></td></tr>',
                 __($k, __NAMESPACE__),
-            $a['field'],
-            $k,
+                $a['field'],
+                $k,
                 esc_attr($v),
                 esc_attr(__($k, __NAMESPACE__))
             );
@@ -410,7 +569,6 @@ class Admin extends Plugin
     {
         printf('<p>%s</p>', __('Please provide feedback on this section.', __NAMESPACE__));
     }
-
 
 
 }

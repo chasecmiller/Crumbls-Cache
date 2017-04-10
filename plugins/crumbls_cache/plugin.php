@@ -83,18 +83,21 @@ class Plugin
             ];
         }
 
+        // This needs worked out. We are here.
         // Setup page cache.
         if (
-            array_key_exists('crumbls_cache_type', $s)
+            array_key_exists('crumbls_cache_type_page', $s)
             &&
-            $s['crumbls_cache_type']
-            &&
-            array_key_exists('crumbls_crumblsCache_' . $s['crumbls_cache_type'], $s)
+            $s['crumbls_cache_type_page']
+  //          &&
+//            array_key_exists('crumbls_crumblsCache_' . $s['crumbls_cache_type'], $s)
         ) {
-            $t = $s['crumbls_crumblsCache_' . $s['crumbls_cache_type']];
+            $t = $s['crumbls_cache_type_page']['type'];
             // Setup File Path on your config files
             CacheManager::setDefaultConfig($t);
-            $this->instance = CacheManager::getInstance($s['crumbls_cache_type']);
+            $this->instance = CacheManager::getInstance($t);
+            print_r($this->instance);
+            exit;
         }
     }
 
