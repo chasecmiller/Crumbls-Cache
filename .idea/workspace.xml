@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d326bda-3e3d-425a-8cc0-486e37643c04" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
     </list>
     <ignored path="Crumbls-Cache.iws" />
@@ -27,8 +28,8 @@
       <file leaf-file-name="plugin.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.2089553">
-              <caret line="455" column="9" selection-start-line="455" selection-start-column="9" selection-end-line="455" selection-end-column="9" />
+            <state vertical-scroll-proportion="-5.9104476">
+              <caret line="270" column="13" selection-start-line="270" selection-start-column="13" selection-end-line="270" selection-end-column="13" />
               <folding>
                 <element signature="e#6#305#0#PHP" expanded="true" />
               </folding>
@@ -36,24 +37,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="object-cache.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="object-cache.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/object-cache.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.32">
-              <caret line="213" column="18" selection-start-line="213" selection-start-column="18" selection-end-line="213" selection-end-column="18" />
+            <state vertical-scroll-proportion="-0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="admin.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="admin.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.5522387">
-              <caret line="477" column="36" selection-start-line="477" selection-start-column="36" selection-end-line="477" selection-end-column="36" />
+            <state vertical-scroll-proportion="0.32">
+              <caret line="471" column="0" selection-start-line="471" selection-start-column="0" selection-end-line="471" selection-end-column="0" />
               <folding>
                 <element signature="e#6#43#0#PHP" expanded="true" />
-                <marker date="1491785800069" expanded="true" signature="11044:11195" placeholder="..." />
+                <marker date="1491833619957" expanded="true" signature="11052:11203" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -124,9 +125,9 @@
         <option value="$PROJECT_DIR$/object-cache.php" />
         <option value="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcached/Driver.php" />
         <option value="$PROJECT_DIR$/plugins/crumbls_cache/assets/css/plugin.css" />
-        <option value="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
         <option value="$PROJECT_DIR$/plugins/crumbls_cache/assets/js/plugin.js" />
         <option value="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
+        <option value="$PROJECT_DIR$/plugins/crumbls_cache/admin.php" />
       </list>
     </option>
   </component>
@@ -400,7 +401,7 @@
           <caret line="332" column="49" selection-start-line="332" selection-start-column="49" selection-end-line="332" selection-end-column="49" />
           <folding>
             <element signature="e#6#43#0#PHP" expanded="true" />
-            <marker date="1491785800069" expanded="true" signature="11044:11195" placeholder="..." />
+            <marker date="1491833619957" expanded="true" signature="11052:11203" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -461,7 +462,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#6#43#0#PHP" expanded="true" />
-            <marker date="1491785800069" expanded="true" signature="11044:11195" placeholder="..." />
+            <marker date="1491833619957" expanded="true" signature="11052:11203" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -540,7 +541,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#6#43#0#PHP" expanded="true" />
-            <marker date="1491785800069" expanded="true" signature="11044:11195" placeholder="..." />
+            <marker date="1491833619957" expanded="true" signature="11052:11203" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -656,17 +657,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.5522387">
-          <caret line="477" column="36" selection-start-line="477" selection-start-column="36" selection-end-line="477" selection-end-column="36" />
-          <folding>
-            <element signature="e#6#43#0#PHP" expanded="true" />
-            <marker date="1491785800069" expanded="true" signature="11044:11195" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/assets/js/plugin.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.3333335">
@@ -675,21 +665,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/object-cache.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/plugin.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.2089553">
-          <caret line="455" column="9" selection-start-line="455" selection-start-column="9" selection-end-line="455" selection-end-column="9" />
+        <state vertical-scroll-proportion="-5.9104476">
+          <caret line="270" column="13" selection-start-line="270" selection-start-column="13" selection-end-line="270" selection-end-column="13" />
           <folding>
             <element signature="e#6#305#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/object-cache.php">
+    <entry file="file://$PROJECT_DIR$/plugins/crumbls_cache/admin.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.32">
-          <caret line="213" column="18" selection-start-line="213" selection-start-column="18" selection-end-line="213" selection-end-column="18" />
-          <folding />
+          <caret line="471" column="0" selection-start-line="471" selection-start-column="0" selection-end-line="471" selection-end-column="0" />
+          <folding>
+            <element signature="e#6#43#0#PHP" expanded="true" />
+            <marker date="1491833619957" expanded="true" signature="11052:11203" placeholder="..." />
+          </folding>
         </state>
       </provider>
     </entry>

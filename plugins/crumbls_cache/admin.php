@@ -271,13 +271,13 @@ class Admin extends Plugin
 //        print_r($this->getStats());
 
 //print_r();
-
+/*
         $files = ($this->instance) ? $files = $this->getStats()->getInfo() : '';
 
         if (preg_match('#: (\d+)#', $files, $m)) {
             $files = $m[1];
         }
-
+*/
         ?>
         <div class="wrap">
             <h1><?php _e('Cache', __NAMESPACE__); ?></h1>
@@ -302,14 +302,14 @@ class Admin extends Plugin
             echo '<br />';
 
             $url = admin_url('admin.php?page=cache&action=clearFrontpage&key=' . time());
-
+/*
             if ($this->instance && $this->instance->hasItem('/')) {
                 // Exists
                 printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
             } else {
                 printf('<a href="%s" class="button button-secondary disabled button-disabled" disabled>%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
             }
-
+*/
             ?>
         </div>
         <?php
@@ -462,6 +462,14 @@ class Admin extends Plugin
 
         $ref = $options[$a['field']];
 
+        if (
+            !array_key_exists('path', $ref)
+        ||
+            !$ref['path']
+        ) {
+            $ref['path'] = WP_CONTENT_DIR . '/cache/crumbls/';
+        }
+
         foreach ([
                      'compress_data' => 'memcache',
                      'ip' => 'memcache memcached',
@@ -479,7 +487,7 @@ class Admin extends Plugin
                 $class,
                 __($field, __NAMESPACE__),
                 $field,
-                array_key_exists($field, $ref) ? esc_attr($ref['field']) : ''
+                array_key_exists($field, $ref) ? esc_attr($ref[$field]) : ''
             );
         }
         return;

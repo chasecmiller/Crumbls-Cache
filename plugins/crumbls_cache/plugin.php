@@ -20,7 +20,11 @@ global $cache;
 
 class Plugin
 {
-    protected $instance = null;
+    // Hand holding.
+    protected $page = null;
+    protected $object = null;
+    protected $transient = null;
+    
     protected $tags = null;
     protected $expires = -1;
     protected $config_path = __DIR__ . '/config.php';
@@ -74,10 +78,12 @@ class Plugin
             $s = include($this->config_path);
         }
 
+
+ // Needs rewrite
         if (!is_array($s)) {
             $s = [
-                'crumbls_cache_type' => 'files',
-                'crumbls_crumblsCache_files' => [
+                'crumbls_cache_type_page' => [
+                    'type' => 'files',
                     'path' => WP_CONTENT_DIR . '/cache/crumbls/'
                 ]
             ];
@@ -89,13 +95,55 @@ class Plugin
             array_key_exists('crumbls_cache_type_page', $s)
             &&
             $s['crumbls_cache_type_page']
-  //          &&
-//            array_key_exists('crumbls_crumblsCache_' . $s['crumbls_cache_type'], $s)
+            &&
+            array_key_exists('type', $s['crumbls_cache_type_page'])
+            &&
+            $s['crumbls_cache_type_page']['type']
         ) {
+            // Make sure path is set.
+            // This needs to be moved into the save method.
+            // You shouldn't be back peddling here.
+            if (
+                $s['crumbls_cache_type_page']['type'] == 'files'
+            &&
+                (
+                    !array_key_exists('path', $s['crumbls_cache_type_page'])
+                ||
+                    !$s['crumbls_cache_type_page']['path']
+                )
+            ) {
+                $s['crumbls_cache_type_page']['path'] = WP_CONTENT_DIR . '/cache/crumbls/';
+            }
+
             $t = $s['crumbls_cache_type_page']['type'];
             // Setup File Path on your config files
-            CacheManager::setDefaultConfig($t);
-            $this->instance = CacheManager::getInstance($t);
+            CacheManager::setDefaultConfig($t, $s['crumbls_cache_type_page']);
+            $this->page = CacheManager::getInstance($t);
+        }
+
+        unset($s['crumbls_cache_type_page']);
+
+        foreach($s as $k => $v) {
+            // Last word
+            $k = substr($k, strrpos($k,'_')+1);
+            if (
+                !array_key_exists('type', $v)
+            ||
+                !$v['type']
+                ||
+                $v['type'] == 'crumbls_cache_type_page'
+            ) {
+                // Set to file.
+                $this->$k = &$this->page;
+            } else if (
+                array_key_exists($v['type'], $s)
+            ) {
+                echo __LINE__.' '.basename(__FILE__);
+                exit;
+            } else {
+                echo __LINE__.' '.basename(__FILE__);
+                exit;
+            }
         }
     }
 
@@ -111,6 +159,7 @@ class Plugin
 
     /**
      * advanced-cache.php handler.
+     * Auto set/get page cache.
      **/
     public function advancedCache()
     {
@@ -149,7 +198,6 @@ class Plugin
              * Add in membership level.
              * Not secure.
              * Allow bypass for search engines.
-             * This is written for membership sites.
              **/
             /*
             if (array_key_exists('userdata', $_COOKIE) && preg_match('#"user_status":\s?"(.*?)"#', $_COOKIE['userdata'], $m)) {
@@ -178,11 +226,9 @@ class Plugin
             }
         }
 
-        $storage = $this->read(cache_key);
-
-        if ($storage) {
-            echo 'a';
-            echo $storage;
+        $storage = $this->page->getItem(cache_key);
+        if ($storage->isHit()) {
+            echo $storage->get();
             printf('<!-- Cache: %s -->', cache_key);
             exit(1);
         }
@@ -218,7 +264,18 @@ class Plugin
             // Quick cleanup.
             $this->tags = array_unique($this->tags);
 
-            $this->add(cache_key, ob_get_contents(), $this->tags, $this->expires);
+            $CachedString = $this->page->getItem(cache_key);
+            $CachedString->set(ob_get_contents());
+            if ($this->tags) {
+                $CachedString->setTags($this->tags);
+            }
+            /**
+             * Cache expiration
+             * Currently disabled.
+             * Page cache clears on edit, add, update, delete.
+             */
+//                $CachedString->expiresAfter($expires);
+            $this->page->save($CachedString);
 
             ob_end_flush();
         });
@@ -226,6 +283,7 @@ class Plugin
 
     /**
      * (B)rowse
+     * Browse items in the object cache.
      **/
     public function browse()
     {
@@ -233,28 +291,38 @@ class Plugin
 
     /**
      * (r)ead
+     * Read an item from the object cache.
      **/
     public function read($key)
     {
-        if (!$this->instance) {
-            return false;
-        }
-
+/*
         if (!in_array($key, [
             'is_blogged_installed'
         ])) {
             return false;
         }
         echo "<br>\r\nKEY:".$key."<br />\r\n";
+*/
+        // Determine which cache to use, quickly.
+        // Not the best way, but it works for now.
+        $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
 
-        if ($ret = $this->instance->getItem($key)) {
+        if (!$context) {
+            return false;
+        }
+
+        $ret = $context->getItem($key);
+        if ($ret->isHit()) {
+//            echo 'isset: '.$key."<br />\r\n";
             return $ret->get();
         }
+//        echo 'unset: '.$key."<br />\r\n";
         return false;
     }
 
     /**
      * (e)dit
+     * Edit an item from the object cache.
      **/
     public function edit($key, $value, $tags, $expires)
     {
@@ -263,59 +331,69 @@ class Plugin
 
     /**
      * (e)dit Decrease
+     * Edit Decrease an item from the object cache.
      */
     public function editDecrease($key, $value, $tags) {
-        if (!$this->instance) {
-            return false;
+        $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
+        if (!$context) {
+            return;
         }
+
         if (is_string($tags)) {
             $tags = [$tags];
         }
 
-        $CachedString = $this->instance->getItem($key);
-        if (!$CachedString) {
+        $CachedString = $context->getItem($key);
+        if (!$CachedString->isHit()) {
             return false;
         }
 
         $CachedString->get()->decrement((int)$value);
 
-        $this->instance->save($CachedString);
+        $context->save($CachedString);
     }
 
 
     /**
      * (e)dit Increase
+     * Edit Increase an item from the object cache.
      */
     public function editIncrease($key, $value, $tags) {
-        if (!$this->instance) {
-            return false;
+        $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
+        if (!$context) {
+            return;
         }
         if (is_string($tags)) {
             $tags = [$tags];
         }
 
-        $CachedString = $this->instance->getItem($key);
-        if (!$CachedString) {
+        $CachedString = $context->getItem($key);
+        if (!$CachedString->isHit()) {
             return false;
         }
 
         $CachedString->get()->increment((int)$value);
 
-        $this->instance->save($CachedString);
+        $context->save($CachedString);
     }
 
     /**
      * (a)dd
+     * Add an item to the object cache.
      **/
     public function add($key, $value, $tags = null, $expires = -1)
     {
-        if (!$this->instance) {
-            return false;
+        // Auto route
+        // Determine which cache to use, quickly.
+        // Not the best way, but it works for now.
+        $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
+        if (!$context) {
+            return;
         }
         if (is_string($tags)) {
             $tags = [$tags];
         }
-        $CachedString = $this->instance->getItem($key);
+        $CachedString = $context->getItem($key);
         $CachedString->set($value);
         if ($tags) {
             $CachedString->setTags($tags);
@@ -323,27 +401,42 @@ class Plugin
         if ($expires > 0) {
             $CachedString->expiresAfter($expires);
         }
-        $this->instance->save($CachedString);
+
+        $context->save($CachedString);
     }
 
     /**
      * (d)elete
+     * Delete from the object cache.
      **/
     public function delete($key = null, $tags = null)
     {
-        if (!$this->instance) {
+        if (!$key && !$tags) {
+            echo __LINE__.' '.basename(__FILE__);exit;
+            // Handle.
+            return;
+        } else if (!$key && $tags) {
+            echo __LINE__.' '.basename(__FILE__);exit;
+            // Handle.
+            return;
+        }
+        // Auto route
+        // Determine which cache to use, quickly.
+        // Not the best way, but it works for now.
+        $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
+        if (!$context) {
             return;
         }
         // Easy way to clean up key or tags.
         if ($key) {
             //echo $key;
-            $this->instance->deleteItem($key);
+            $context->deleteItem($key);
         }
         if ($tags) {
             if (!is_array($tags)) {
                 $tags = [$tags];
             }
-            $this->instance->deleteItemsByTags($tags);
+            $context->deleteItemsByTags($tags);
         }
     }
 
@@ -351,20 +444,20 @@ class Plugin
      * Flush cache
      */
     public function flush() {
-        if (!$this->instance) {
+        if (!$this->page) {
             return;
         }
-        return $this->instance->flush();
+        return $this->page->flush();
     }
 
     /**
      * Output statistics
      */
     public function getStats() {
-        if (!$this->instance) {
+        if (!$this->page) {
             return;
         }
-        return $this->instance->getStats();
+        return $this->page->getStats();
     }
 
     /**
@@ -372,7 +465,7 @@ class Plugin
      **/
     public function getInstance()
     {
-        return $this->instance;
+        return $this->page;
     }
 
     public function postPublish($ID, $post)
