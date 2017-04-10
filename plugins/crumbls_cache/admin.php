@@ -207,25 +207,25 @@ class Admin extends Plugin
     {
         $possible = [
             false => __('Disabled', __NAMESPACE__),
-            'apc' => __('APC', __NAMESPACE__),
-            'apcu' => __('APCU', __NAMESPACE__),
-            'couchbase' => __('Couchbase', __NAMESPACE__),
-            'devfalse' => __('DevFalse', __NAMESPACE__),
-            'devnull' => __('DevNull', __NAMESPACE__),
-            'devtrue' => __('DevTrue', __NAMESPACE__),
+//           'apc' => __('APC', __NAMESPACE__),
+//            'apcu' => __('APCU', __NAMESPACE__),
+//            'couchbase' => __('Couchbase', __NAMESPACE__),
+//            'devfalse' => __('DevFalse', __NAMESPACE__),
+//            'devnull' => __('DevNull', __NAMESPACE__),
+//            'devtrue' => __('DevTrue', __NAMESPACE__),
             'files' => __('File (Recommended)', __NAMESPACE__),
-            'leveldb' => __('Leveldb', __NAMESPACE__),
+//            'leveldb' => __('Leveldb', __NAMESPACE__),
             'memcache' => __('Memcache', __NAMESPACE__),
             'memcached' => __('Memcached', __NAMESPACE__),
-            'mongodb' => __('MongoDB', __NAMESPACE__),
-            'predix' => __('Predis', __NAMESPACE__),
-            'redis' => __('Redis', __NAMESPACE__),
-            'sqlite' => __('Sqlite', __NAMESPACE__),
-            'ssdb' => __('Ssdb', __NAMESPACE__),
-            'wincache' => __('Wincache', __NAMESPACE__),
-            'xcache' => __('Xcache', __NAMESPACE__),
-            'zenddisk' => __('Zendisk', __NAMESPACE__),
-            'zendshm' => __('Zendshm', __NAMESPACE__)
+//            'mongodb' => __('MongoDB', __NAMESPACE__),
+//            'predix' => __('Predis', __NAMESPACE__),
+//            'redis' => __('Redis', __NAMESPACE__),
+//            'sqlite' => __('Sqlite', __NAMESPACE__),
+//            'ssdb' => __('Ssdb', __NAMESPACE__),
+//            'wincache' => __('Wincache', __NAMESPACE__),
+//            'xcache' => __('Xcache', __NAMESPACE__),
+//            'zenddisk' => __('Zendisk', __NAMESPACE__),
+//            'zendshm' => __('Zendshm', __NAMESPACE__)
         ];
         return $possible;
     }
@@ -271,13 +271,13 @@ class Admin extends Plugin
 //        print_r($this->getStats());
 
 //print_r();
-/*
-        $files = ($this->instance) ? $files = $this->getStats()->getInfo() : '';
+        /*
+                $files = ($this->instance) ? $files = $this->getStats()->getInfo() : '';
 
-        if (preg_match('#: (\d+)#', $files, $m)) {
-            $files = $m[1];
-        }
-*/
+                if (preg_match('#: (\d+)#', $files, $m)) {
+                    $files = $m[1];
+                }
+        */
         ?>
         <div class="wrap">
             <h1><?php _e('Cache', __NAMESPACE__); ?></h1>
@@ -286,6 +286,19 @@ class Admin extends Plugin
                 grow on.</p>
             <p>It's only going to do it's job. If you want to merge, minify, etc, that's not this plugin's job.</p>
             <p>Please send any feedback to chase@crumbls.com or https://github.com/chasecmiller/Crumbls-Cache</p>
+            <p>Things to work on:
+            <ul>
+                <li>
+                    Administrative clearing of cache.
+                </li>
+                <li>
+                    Administrative stats.
+                </li>
+                <li>
+                    Support for more types.
+                </li>
+            </ul>
+            </p>
 
 
             <?php
@@ -302,14 +315,14 @@ class Admin extends Plugin
             echo '<br />';
 
             $url = admin_url('admin.php?page=cache&action=clearFrontpage&key=' . time());
-/*
-            if ($this->instance && $this->instance->hasItem('/')) {
-                // Exists
-                printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
-            } else {
-                printf('<a href="%s" class="button button-secondary disabled button-disabled" disabled>%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
-            }
-*/
+            /*
+                        if ($this->instance && $this->instance->hasItem('/')) {
+                            // Exists
+                            printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
+                        } else {
+                            printf('<a href="%s" class="button button-secondary disabled button-disabled" disabled>%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
+                        }
+            */
             ?>
         </div>
         <?php
@@ -464,7 +477,7 @@ class Admin extends Plugin
 
         if (
             !array_key_exists('path', $ref)
-        ||
+            ||
             !$ref['path']
         ) {
             $ref['path'] = WP_CONTENT_DIR . '/cache/crumbls/';

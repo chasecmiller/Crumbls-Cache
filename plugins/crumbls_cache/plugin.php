@@ -24,7 +24,7 @@ class Plugin
     protected $page = null;
     protected $object = null;
     protected $transient = null;
-    
+
     protected $tags = null;
     protected $expires = -1;
     protected $config_path = __DIR__ . '/config.php';
@@ -79,7 +79,7 @@ class Plugin
         }
 
 
- // Needs rewrite
+        // Needs rewrite
         if (!is_array($s)) {
             $s = [
                 'crumbls_cache_type_page' => [
@@ -105,10 +105,10 @@ class Plugin
             // You shouldn't be back peddling here.
             if (
                 $s['crumbls_cache_type_page']['type'] == 'files'
-            &&
+                &&
                 (
                     !array_key_exists('path', $s['crumbls_cache_type_page'])
-                ||
+                    ||
                     !$s['crumbls_cache_type_page']['path']
                 )
             ) {
@@ -123,12 +123,18 @@ class Plugin
 
         unset($s['crumbls_cache_type_page']);
 
-        foreach($s as $k => $v) {
+        foreach ($s as $k => $v) {
             // Last word
-            $k = substr($k, strrpos($k,'_')+1);
+            $k = substr($k, strrpos($k, '_') + 1);
+
+            // Simplify this.
             if (
+                $v['type'] === false
+            ) {
+                $this->$k = false;
+            } else if (
                 !array_key_exists('type', $v)
-            ||
+                ||
                 !$v['type']
                 ||
                 $v['type'] == 'crumbls_cache_type_page'
@@ -136,13 +142,15 @@ class Plugin
                 // Set to file.
                 $this->$k = &$this->page;
             } else if (
-                array_key_exists($v['type'], $s)
+            array_key_exists($v['type'], $s)
             ) {
-                echo __LINE__.' '.basename(__FILE__);
+                echo __LINE__ . ' ' . basename(__FILE__);
                 exit;
             } else {
-                echo __LINE__.' '.basename(__FILE__);
-                exit;
+//                $t = $v['type'];
+                // Setup File Path on your config files
+                CacheManager::setDefaultConfig($v['type'], $v);
+                $this->$k = CacheManager::getInstance($v['type']);
             }
         }
     }
@@ -295,14 +303,14 @@ class Plugin
      **/
     public function read($key)
     {
-/*
-        if (!in_array($key, [
-            'is_blogged_installed'
-        ])) {
-            return false;
-        }
-        echo "<br>\r\nKEY:".$key."<br />\r\n";
-*/
+        /*
+                if (!in_array($key, [
+                    'is_blogged_installed'
+                ])) {
+                    return false;
+                }
+                echo "<br>\r\nKEY:".$key."<br />\r\n";
+        */
         // Determine which cache to use, quickly.
         // Not the best way, but it works for now.
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
@@ -326,14 +334,15 @@ class Plugin
      **/
     public function edit($key, $value, $tags, $expires)
     {
-        return $this->add($key,$value,$tags,$expires);
+        return $this->add($key, $value, $tags, $expires);
     }
 
     /**
      * (e)dit Decrease
      * Edit Decrease an item from the object cache.
      */
-    public function editDecrease($key, $value, $tags) {
+    public function editDecrease($key, $value, $tags)
+    {
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
         if (!$context) {
             return;
@@ -358,7 +367,8 @@ class Plugin
      * (e)dit Increase
      * Edit Increase an item from the object cache.
      */
-    public function editIncrease($key, $value, $tags) {
+    public function editIncrease($key, $value, $tags)
+    {
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
         if (!$context) {
             return;
@@ -412,11 +422,13 @@ class Plugin
     public function delete($key = null, $tags = null)
     {
         if (!$key && !$tags) {
-            echo __LINE__.' '.basename(__FILE__);exit;
+            echo __LINE__ . ' ' . basename(__FILE__);
+            exit;
             // Handle.
             return;
         } else if (!$key && $tags) {
-            echo __LINE__.' '.basename(__FILE__);exit;
+            echo __LINE__ . ' ' . basename(__FILE__);
+            exit;
             // Handle.
             return;
         }
@@ -443,7 +455,8 @@ class Plugin
     /**
      * Flush cache
      */
-    public function flush() {
+    public function flush()
+    {
         if (!$this->page) {
             return;
         }
@@ -453,7 +466,8 @@ class Plugin
     /**
      * Output statistics
      */
-    public function getStats() {
+    public function getStats()
+    {
         if (!$this->page) {
             return;
         }
