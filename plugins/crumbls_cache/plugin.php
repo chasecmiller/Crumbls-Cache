@@ -147,7 +147,7 @@ class Plugin
     {
         // Determine if we should load advanced cache.
 
-        global $wpdb;
+        global $wpdb, $current_user;
         if (preg_match('#/wp-(admin|login)#', $_SERVER['REQUEST_URI'])) {
             return;
         }
@@ -177,17 +177,21 @@ class Plugin
             $args = array_filter(array_intersect_key($_REQUEST, array_flip($allowed)));
 
             /**
-             * Add in membership level.
-             * Not secure.
-             * Allow bypass for search engines.
+             * Get current user's data.
+             * Allow override, eventually.
              **/
-            /*
-            if (array_key_exists('userdata', $_COOKIE) && preg_match('#"user_status":\s?"(.*?)"#', $_COOKIE['userdata'], $m)) {
-                $args['member'] = $m[1];
-            } else {
-		$args['member'] = false;
-	    }
-*/
+            if ( defined('XMLRPC_REQUEST') && XMLRPC_REQUEST ) {
+            } else if (true) {
+                $args['is_logged_in'] = 0;
+                if (!$current_user && $temp = preg_grep('#^wordpress_logged_in_#', array_keys($_COOKIE))) {
+                    $temp = array_values($temp);
+                    if (sizeof($temp) == 1) {
+                        // Look at username.
+                        $args['is_logged_in'] = 1;
+                    }
+                }
+            }
+
             $args['url'] = explode('?', $_SERVER['REQUEST_URI'], 2)[0];
 
             if ($args['url'] == '/' || strpos($args['url'], '/category/') !== false) {
