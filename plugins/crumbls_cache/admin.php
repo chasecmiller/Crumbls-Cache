@@ -251,7 +251,6 @@ class Admin extends Plugin
         }
 
         if (
-
             array_key_exists('key', $_REQUEST)
             &&
             array_key_exists('action', $_REQUEST)
@@ -263,18 +262,35 @@ class Admin extends Plugin
             // How to stop someone from just hitting refresh and retriggering?
             switch ($_REQUEST['action']) {
                 case 'clearAll':
-                    if ($this->instance) {
-                        $this->instance->clear();
+                    foreach ([
+                                 'page',
+                                 'object',
+                                 'transient'
+                             ] as $k) {
+                        if ($this->$k) {
+                            $this->$k->clear();
+                        }
                     }
                     break;
-                case 'clearFrontpage':
-                    $this->delete('/', ['/']);
+                case
+                'clearFrontpage':
+                    foreach ([
+                                 'page',
+                                 'object',
+                                 'transient'
+                             ] as $k) {
+                        if ($this->$k) {
+                            $this->$k->deleteItem('/');
+                            $this->$k->deleteItemsByTags(['/']);
+                        }
+                    }
                     break;
                 default:
             }
         }
 
         $path = false;
+
 
 //        print_r($this->getStats());
 
@@ -311,20 +327,35 @@ class Admin extends Plugin
 
 
             <?php
-            $files = false;
-            //            printf('<p>Cached entries: %d</p>', $files);
+            // Do this better.  Remove duplicates if using the exact same mech.
+            foreach (['page',
+                         'object',
+                         'transient'] as $k) {
+                if ($this->$k) {
+                    /*
+                    $count = 0;
+                    if (preg_match('#: (\d+)#', $this->$k->getStats()->getInfo(), $m)) {
+                        $count = $m[1];
+                    }
 
-            $url = admin_url('admin.php?page=cache&action=clearAll&key=' . time());
-            if ($files) {
-                // Exists
-                printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Cache', __NAMESPACE__));
-            } else {
-                printf('<a href="%s" class="button button-secondary disabled button-disabled" disabled>%s</a>', $url, __('Clear Cache', __NAMESPACE__));
+                    printf('<p>%s: %d %s</p>',
+                        __($k, __NAMESPACE__),
+                        $count,
+                        'entries'
+                    );
+                    */
+                }
             }
 
             echo '<br />';
 
+            // Temp buttons.
             $url = admin_url('admin.php?page=cache&action=clearFrontpage&key=' . time());
+            printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Front Page', __NAMESPACE__));
+            echo '<br />';
+            $url = admin_url('admin.php?page=cache&action=clearAll&key=' . time());
+            printf('<a href="%s" class="button button-primary">%s</a>', $url, __('Clear Cache', __NAMESPACE__));
+
             /*
                         if ($this->instance && $this->instance->hasItem('/')) {
                             // Exists
@@ -454,7 +485,8 @@ class Admin extends Plugin
      * when it looks right.
      * @param null $a
      */
-    public function renderSection($a = null)
+    public
+    function renderSection($a = null)
     {
         $options = get_option('crumbls_settings');
         echo '<hr>';
@@ -471,7 +503,8 @@ class Admin extends Plugin
      *
      * @param null $a
      */
-    public function renderFieldCacheType($a = null)
+    public
+    function renderFieldCacheType($a = null)
     {
         if (!$a || !array_key_exists('field', $a)) {
             return;
@@ -511,14 +544,15 @@ class Admin extends Plugin
             printf('<tr class="field hidden %s"><th>%s</th><td><input type="text" name="%s" value="%s" /></td></tr>',
                 $class,
                 __($field, __NAMESPACE__),
-                'crumbls_settings['.$a['field'].']['.$field.']',
+                'crumbls_settings[' . $a['field'] . '][' . $field . ']',
                 array_key_exists($field, $ref) ? esc_attr($ref[$field]) : ''
             );
         }
         return;
     }
 
-    public function renderFieldTextDump($a = null)
+    public
+    function renderFieldTextDump($a = null)
     {
         $options = get_option('crumbls_settings');
         if (!array_key_exists($a['field'], $options)) {
@@ -570,7 +604,8 @@ class Admin extends Plugin
      * General cache settings header.
      * @param $a
      */
-    protected function _crumblsCache_general($a)
+    protected
+    function _crumblsCache_general($a)
     {
         printf('<p>%s</p>', __('General cache settings', __NAMESPACE__));
     }
@@ -579,7 +614,8 @@ class Admin extends Plugin
      * Cache files settings header.
      * @param $a
      */
-    protected function _crumblsCache_files($a)
+    protected
+    function _crumblsCache_files($a)
     {
         printf('<p>%s</p>', __('A file driver that use serialization for storing data for regular performances. A path must be specified, else the system temporary directory will be used.', __NAMESPACE__));
         printf('<p>%s</p>', __('The path is not yet verified.  You need to verify it right now for security reasons.', __NAMESPACE__));
@@ -589,7 +625,8 @@ class Admin extends Plugin
      * Cache memcache settings header.
      * @param $a
      */
-    protected function _crumblsCache_memcache($a)
+    protected
+    function _crumblsCache_memcache($a)
     {
         printf('<p>%s</p>', __('Please provide feedback on this section.', __NAMESPACE__));
     }
@@ -598,7 +635,8 @@ class Admin extends Plugin
      * Cache memcache settings header.
      * @param $a
      */
-    protected function _crumblsCache_memcached($a)
+    protected
+    function _crumblsCache_memcached($a)
     {
         printf('<p>%s</p>', __('Please provide feedback on this section.', __NAMESPACE__));
     }
