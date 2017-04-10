@@ -203,39 +203,35 @@ class Admin extends Plugin
         add_submenu_page($parent, __('Cache', __NAMESPACE__), __('Cache', __NAMESPACE__), 'manage_options', 'cache', array(&$this, 'pageCache'));
     }
 
+    /**
+     * Get all supported drivers.
+     *
+     * @author Chase C. Miller <chase@crumbls.com>
+     * @return array
+     */
     protected function getSupported()
     {
-        $possible = [
-            false => __('Disabled', __NAMESPACE__),
-//           'apc' => __('APC', __NAMESPACE__),
-//            'apcu' => __('APCU', __NAMESPACE__),
-//            'couchbase' => __('Couchbase', __NAMESPACE__),
-            'devfalse' => __('DevFalse', __NAMESPACE__),
-            'devnull' => __('DevNull', __NAMESPACE__),
-            'devtrue' => __('DevTrue', __NAMESPACE__),
-            'files' => __('File', __NAMESPACE__),
-//            'leveldb' => __('Leveldb', __NAMESPACE__),
-            'memcache' => __('Memcache', __NAMESPACE__),
-            'memcached' => __('Memcached', __NAMESPACE__),
-//            'mongodb' => __('MongoDB', __NAMESPACE__),
-//            'predix' => __('Predis', __NAMESPACE__),
-//            'redis' => __('Redis', __NAMESPACE__),
-//            'sqlite' => __('Sqlite', __NAMESPACE__),
-//            'ssdb' => __('Ssdb', __NAMESPACE__),
-//            'wincache' => __('Wincache', __NAMESPACE__),
-//            'xcache' => __('Xcache', __NAMESPACE__),
-//            'zenddisk' => __('Zendisk', __NAMESPACE__),
-//            'zendshm' => __('Zendshm', __NAMESPACE__)
-        ];
-
-        // Is wp_debug enabled?
-        if (!defined('WP_DEBUG') || !WP_DEBUG) {
-            unset($possible['devfalse']);
-            unset($possible['devnull']);
-            unset($possible['devtrue']);
+        // Rewrite to actually check.
+        $cm = new CacheManager();
+        $ret = [];
+        foreach ($cm->getStaticSystemDrivers() as $driver) {
+            try {
+                $temp = $cm->getInstance($driver, []);
+                if ($temp->driverCheck()) {
+                    $ret[strtolower($driver)] = __($cm->standardizeDriverName($driver), __NAMESPACE__);
+                }
+            } catch (\phpFastCache\Exceptions\phpFastCacheDriverCheckException $e) {
+                continue;
+            }
         }
 
-        return $possible;
+        /**
+         * APCU now requires a backwards comparability extension.
+         */
+        if (array_key_exists('apcu', $ret) && !function_exists('apc_fetch')) {
+            unset($ret['apcu']);
+        }
+        return $ret;
     }
 
     /**
@@ -530,7 +526,7 @@ class Admin extends Plugin
                      'cache_time' => 'files',
                      'compress_data' => 'memcache',
                      'ip' => 'memcache memcached',
-                     'path' => 'files',
+                     'path' => 'files sqlite',
                      'sasl_user' => 'memcache memcached',
                      'sasl_password' => 'memcache memcached',
                      'host' => 'memcache memcached mongodb',
