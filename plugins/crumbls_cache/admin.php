@@ -66,13 +66,13 @@ class Admin extends Plugin
         );
 
         add_settings_field(
-            'crumbls_cache_type_transients',
+            'crumbls_cache_type_transient',
             __('Transient Cache Type', __NAMESPACE__),
             [$this, 'renderFieldCacheType'],
             'crumblsCache',
             'crumbls_crumblsCache_general',
             [
-                'field' => 'crumbls_cache_type_transients',
+                'field' => 'crumbls_cache_type_transient',
                 'show_tab' => true
             ]
         );
@@ -210,10 +210,10 @@ class Admin extends Plugin
 //           'apc' => __('APC', __NAMESPACE__),
 //            'apcu' => __('APCU', __NAMESPACE__),
 //            'couchbase' => __('Couchbase', __NAMESPACE__),
-//            'devfalse' => __('DevFalse', __NAMESPACE__),
-//            'devnull' => __('DevNull', __NAMESPACE__),
-//            'devtrue' => __('DevTrue', __NAMESPACE__),
-            'files' => __('File (Recommended)', __NAMESPACE__),
+            'devfalse' => __('DevFalse', __NAMESPACE__),
+            'devnull' => __('DevNull', __NAMESPACE__),
+            'devtrue' => __('DevTrue', __NAMESPACE__),
+            'files' => __('File', __NAMESPACE__),
 //            'leveldb' => __('Leveldb', __NAMESPACE__),
             'memcache' => __('Memcache', __NAMESPACE__),
             'memcached' => __('Memcached', __NAMESPACE__),
@@ -227,6 +227,14 @@ class Admin extends Plugin
 //            'zenddisk' => __('Zendisk', __NAMESPACE__),
 //            'zendshm' => __('Zendshm', __NAMESPACE__)
         ];
+
+        // Is wp_debug enabled?
+        if (!defined('WP_DEBUG') || !WP_DEBUG) {
+            unset($possible['devfalse']);
+            unset($possible['devnull']);
+            unset($possible['devtrue']);
+        }
+
         return $possible;
     }
 
@@ -284,7 +292,8 @@ class Admin extends Plugin
             <p>Thanks for trying this plugin out.</p>
             <p>It's important to remember that it is in early alpha stages and is designed to provided a platform to
                 grow on.</p>
-            <p>It's only going to do it's job. If you want to merge, minify, etc, that's not this plugin's job.</p>
+            <p>It's only going to do it's job. If you want to merge, minify, etc, that's not what this plugin is here
+                for.</p>
             <p>Please send any feedback to chase@crumbls.com or https://github.com/chasecmiller/Crumbls-Cache</p>
             <p>Things to work on:
             <ul>
@@ -302,7 +311,8 @@ class Admin extends Plugin
 
 
             <?php
-            printf('<p>Cached entries: %d</p>', $files);
+            $files = false;
+            //            printf('<p>Cached entries: %d</p>', $files);
 
             $url = admin_url('admin.php?page=cache&action=clearAll&key=' . time());
             if ($files) {
@@ -386,7 +396,7 @@ class Admin extends Plugin
                             selected($options[$k]['type'], 'crumbls_cache_type_page', false),
                             __('Inherit from Page Cache', __NAMESPACE__)
                         );
-                    } else if ($k == 'crumbls_cache_type_transients') {
+                    } else if ($k == 'crumbls_cache_type_transient') {
                         if (
                             !array_key_exists($k, $options)
                             ||
@@ -484,6 +494,7 @@ class Admin extends Plugin
         }
 
         foreach ([
+                     'cache_time' => 'files',
                      'compress_data' => 'memcache',
                      'ip' => 'memcache memcached',
                      'path' => 'files',
@@ -496,10 +507,11 @@ class Admin extends Plugin
                      'timeout' => 'mongodb',
 
                  ] as $field => $class) {
+//            echo $field;
             printf('<tr class="field hidden %s"><th>%s</th><td><input type="text" name="%s" value="%s" /></td></tr>',
                 $class,
                 __($field, __NAMESPACE__),
-                $field,
+                'crumbls_settings['.$a['field'].']['.$field.']',
                 array_key_exists($field, $ref) ? esc_attr($ref[$field]) : ''
             );
         }

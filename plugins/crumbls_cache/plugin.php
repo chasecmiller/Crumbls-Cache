@@ -78,15 +78,8 @@ class Plugin
             $s = include($this->config_path);
         }
 
-
-        // Needs rewrite
-        if (!is_array($s)) {
-            $s = [
-                'crumbls_cache_type_page' => [
-                    'type' => 'files',
-                    'path' => WP_CONTENT_DIR . '/cache/crumbls/'
-                ]
-            ];
+        if (!$s) {
+            return;
         }
 
         // This needs worked out. We are here.
@@ -100,25 +93,8 @@ class Plugin
             &&
             $s['crumbls_cache_type_page']['type']
         ) {
-            // Make sure path is set.
-            // This needs to be moved into the save method.
-            // You shouldn't be back peddling here.
-            if (
-                $s['crumbls_cache_type_page']['type'] == 'files'
-                &&
-                (
-                    !array_key_exists('path', $s['crumbls_cache_type_page'])
-                    ||
-                    !$s['crumbls_cache_type_page']['path']
-                )
-            ) {
-                $s['crumbls_cache_type_page']['path'] = WP_CONTENT_DIR . '/cache/crumbls/';
-            }
-
             $t = $s['crumbls_cache_type_page']['type'];
-            // Setup File Path on your config files
-            CacheManager::setDefaultConfig($t, $s['crumbls_cache_type_page']);
-            $this->page = CacheManager::getInstance($t);
+            $this->page = CacheManager::getInstance($t, $s['crumbls_cache_type_page']);
         }
 
         unset($s['crumbls_cache_type_page']);
@@ -129,7 +105,7 @@ class Plugin
 
             // Simplify this.
             if (
-                $v['type'] === false
+                $v['type'] === '0'
             ) {
                 $this->$k = false;
             } else if (
@@ -144,13 +120,11 @@ class Plugin
             } else if (
             array_key_exists($v['type'], $s)
             ) {
-                echo __LINE__ . ' ' . basename(__FILE__);
-                exit;
+                // Last word
+                $rk = substr($v['type'], strrpos($v['type'], '_') + 1);
+                $this->$k = &$this->$rk;
             } else {
-//                $t = $v['type'];
-                // Setup File Path on your config files
-                CacheManager::setDefaultConfig($v['type'], $v);
-                $this->$k = CacheManager::getInstance($v['type']);
+                $this->$k = CacheManager::getInstance($v['type'], $v);
             }
         }
     }
@@ -303,14 +277,6 @@ class Plugin
      **/
     public function read($key)
     {
-        /*
-                if (!in_array($key, [
-                    'is_blogged_installed'
-                ])) {
-                    return false;
-                }
-                echo "<br>\r\nKEY:".$key."<br />\r\n";
-        */
         // Determine which cache to use, quickly.
         // Not the best way, but it works for now.
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
@@ -321,10 +287,8 @@ class Plugin
 
         $ret = $context->getItem($key);
         if ($ret->isHit()) {
-//            echo 'isset: '.$key."<br />\r\n";
             return $ret->get();
         }
-//        echo 'unset: '.$key."<br />\r\n";
         return false;
     }
 
@@ -411,7 +375,6 @@ class Plugin
         if ($expires > 0) {
             $CachedString->expiresAfter($expires);
         }
-
         $context->save($CachedString);
     }
 
@@ -441,7 +404,6 @@ class Plugin
         }
         // Easy way to clean up key or tags.
         if ($key) {
-            //echo $key;
             $context->deleteItem($key);
         }
         if ($tags) {
@@ -641,6 +603,43 @@ class Plugin
             return;
         }
         @unlink($this->config_path);
+
+        // Update as needed.
+        $new = array_map('array_filter', $new);
+        // Other ways to clean up
+        foreach ($new as $k => &$v) {
+            if (
+                array_key_exists('type', $v)
+            ) {
+                if (array_key_exists($new, $v['type'])
+                ) {
+                    // Minimize.
+                    $v = [
+                        'type' => $v['type']
+                    ];
+                }
+            }
+            if (
+                $v['type'] == 'files'
+            ) {
+                // Handle files updates.
+                $temp = false;
+                if (!array_key_exists('path', $v)) {
+                    $temp = true;
+                } else if (!is_dir($v['path'])) {
+                    $temp = true;
+                } else if (!is_writable($v['path'])) {
+                    $temp = true;
+                }
+                if ($temp) {
+                    $v['path'] = WP_CONTENT_DIR . '/cache/crumbls/';
+                }
+                if (!array_key_exists('cache_time', $v)) {
+                    $v['cache_time'] = -1;
+                }
+            }
+        }
+
         $this->generateConfig($new);
     }
 
@@ -653,7 +652,6 @@ class Plugin
         if (!$in) {
             $in = get_option('crumbls_settings');
         }
-
         try {
             file_put_contents(dirname(__FILE__) . '/config.php', '<?php return ' . var_export($in, true) . ';');
         } catch (\Exception $e) {
