@@ -42,11 +42,12 @@ class Driver extends DriverAbstract
     }
 
     /**
+     * Modified by Chase C. Miller to check for apc_fetch.
      * @return bool
      */
     public function driverCheck()
     {
-        if (extension_loaded('apcu') && ini_get('apc.enabled')) {
+        if (extension_loaded('apcu') && ini_get('apc.enabled') && function_exists('apc_fetch')) {
             return true;
         } else {
             return false;

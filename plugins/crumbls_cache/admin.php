@@ -225,12 +225,6 @@ class Admin extends Plugin
             }
         }
 
-        /**
-         * APCU now requires a backwards comparability extension.
-         */
-        if (array_key_exists('apcu', $ret) && !function_exists('apc_fetch')) {
-            unset($ret['apcu']);
-        }
         return $ret;
     }
 
