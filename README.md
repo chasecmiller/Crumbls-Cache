@@ -15,6 +15,7 @@ It is currently running on a news site with about 400k posts and about one milli
 Right now, the install isn't automtaic and is not made for beginners.  You're going to need to install the plugin then move the advanced-cache.php and object-cache.php into your wp-content directories.  You also will need to set the ENABLE_CACHE constant to true in wp-config.php    
 
 Thanks to:
+[@khoaofgod](https://github.com/khoaofgod) & [@Geolim4](https://github.com/Geolim4) of [PHP.Social](https://github.com/PHPSocialNetwork) for PHPFastCache.
 
 [@mxmkmarquette](https://github.com/mxmkmarquette/) for helping with memcache testing.
 
