@@ -96,8 +96,6 @@ class Plugin
             // Setup File Path on your config files
             CacheManager::setDefaultConfig($t);
             $this->instance = CacheManager::getInstance($t);
-            print_r($this->instance);
-            exit;
         }
     }
 
