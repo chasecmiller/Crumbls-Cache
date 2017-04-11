@@ -35,7 +35,7 @@ function tempErrorHandler($errno, $errstr, $errfile, $errline)
 function sendToLog($log) {
     if (is_string($log)) {
         $log = [
-            'message' => $log
+            'message' => $log,
         ];
     }
     if (!is_array($log)) {
@@ -48,7 +48,7 @@ function sendToLog($log) {
         if (defined('COOKIE_DOMAIN')) {
             $log['domain'] = COOKIE_DOMAIN;
         } else {
-            $log['domain'] = $_SERVER['HTTP_HOST'];
+            $log['domain'] = $_SERVER['SERVER_NAME'];
         }
     }
 

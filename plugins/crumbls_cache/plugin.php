@@ -221,8 +221,7 @@ class Plugin
         }
 
         $storage = $this->page->getItem(cache_key);
-        print_r($storage);
-        exit;
+
         if ($storage->isHit()) {
             echo $storage->get();
             printf('<!-- Cache: %s -->', cache_key);
