@@ -144,6 +144,8 @@ class Plugin
         if (!file_exists($this->config_path)) {
             $this->generateConfig();
         }
+
+        // Temp.
     }
 
     /**
@@ -328,14 +330,20 @@ class Plugin
             $tags = [$tags];
         }
 
+        if (!is_int($value)) {
+            $value = 1;
+        }
+
         $CachedString = $context->getItem($key);
         if (!$CachedString->isHit()) {
             return false;
         }
 
-        $CachedString->get()->decrement((int)$value);
+        $CachedString->decrement($value);
 
         $context->save($CachedString);
+
+        return $CachedString->get();
     }
 
 
@@ -353,14 +361,20 @@ class Plugin
             $tags = [$tags];
         }
 
+        if (!is_int($value)) {
+            $value = 1;
+        }
+
         $CachedString = $context->getItem($key);
         if (!$CachedString->isHit()) {
             return false;
         }
 
-        $CachedString->get()->increment((int)$value);
+        $CachedString->increment($value);
 
         $context->save($CachedString);
+
+        return $CachedString->get();
     }
 
     /**
