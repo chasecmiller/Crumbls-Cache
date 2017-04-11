@@ -88,7 +88,6 @@ class Driver extends DriverAbstract
     protected function driverRead(CacheItemInterface $item)
     {
         $val = $this->instance->get($item->getKey());
-
         if ($val === false) {
             return null;
         } else {
@@ -126,20 +125,40 @@ class Driver extends DriverAbstract
      */
     protected function driverConnect()
     {
-        $servers = (!empty($this->config[ 'memcache' ]) && is_array($this->config[ 'memcache' ]) ? $this->config[ 'memcache' ] : []);
+        $servers = (!empty($this->config['memcache']) && is_array($this->config['memcache']) ? $this->config['memcache'] : []);
+
+        // Temp patch by Chase C. Miller
+        if (array_key_exists('servers', $this->config)) {
+            $merge = explode(',', $this->config['servers']);
+            array_walk($merge, function (&$e) {
+                $e = trim($e);
+                if (preg_match('#^(.*?):(\d+)$#', $e, $e)) {
+                    $e = [$e[1], $e[2]];
+                } else {
+                    $e = false;
+                }
+            });
+            $merge = array_filter($merge);
+            if ($servers) {
+                $servers = array_merge($servers, $merge);
+            } else {
+                $servers = $merge;
+            }
+        }
+
         if (count($servers) < 1) {
             $servers = [
-              ['127.0.0.1', 11211],
+                ['127.0.0.1', 11211],
             ];
         }
 
         foreach ($servers as $server) {
             try {
-                if (!$this->instance->addServer($server[ 0 ], $server[ 1 ])) {
+                if (!$this->instance->addServer($server[0], $server[1])) {
                     $this->fallback = true;
                 }
-                if(!empty($server[ 'sasl_user' ]) && !empty($server[ 'sasl_password'])){
-                    $this->instance->setSaslAuthData($server[ 'sasl_user' ], $server[ 'sasl_password']);
+                if (!empty($server['sasl_user']) && !empty($server['sasl_password'])) {
+                    $this->instance->setSaslAuthData($server['sasl_user'], $server['sasl_password']);
                 }
             } catch (\Exception $e) {
                 $this->fallback = true;
@@ -158,17 +177,17 @@ class Driver extends DriverAbstract
      */
     public function getStats()
     {
-        $stats = (array) $this->instance->getStats();
-        $stats[ 'uptime' ] = (isset($stats[ 'uptime' ]) ? $stats[ 'uptime' ] : 0);
-        $stats[ 'version' ] = (isset($stats[ 'version' ]) ? $stats[ 'version' ] : 'UnknownVersion');
-        $stats[ 'bytes' ] = (isset($stats[ 'bytes' ]) ? $stats[ 'version' ] : 0);
+        $stats = (array)$this->instance->getStats();
+        $stats['uptime'] = (isset($stats['uptime']) ? $stats['uptime'] : 0);
+        $stats['version'] = (isset($stats['version']) ? $stats['version'] : 'UnknownVersion');
+        $stats['bytes'] = (isset($stats['bytes']) ? $stats['version'] : 0);
 
-        $date = (new \DateTime())->setTimestamp(time() - $stats[ 'uptime' ]);
+        $date = (new \DateTime())->setTimestamp(time() - $stats['uptime']);
 
         return (new driverStatistic())
-          ->setData(implode(', ', array_keys($this->itemInstances)))
-          ->setInfo(sprintf("The memcache daemon v%s is up since %s.\n For more information see RawData.", $stats[ 'version' ], $date->format(DATE_RFC2822)))
-          ->setRawData($stats)
-          ->setSize($stats[ 'bytes' ]);
+            ->setData(implode(', ', array_keys($this->itemInstances)))
+            ->setInfo(sprintf("The memcache daemon v%s is up since %s.\n For more information see RawData.", $stats['version'], $date->format(DATE_RFC2822)))
+            ->setRawData($stats)
+            ->setSize($stats['bytes']);
     }
 }

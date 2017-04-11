@@ -48,7 +48,9 @@ class Plugin
         add_action('init', [$this, 'actionInit']);
 
         // Updated.
-        add_action('update_option', [$this, 'optionUpdate'], 10, 3);
+//        add_action('update_option', [$this, 'optionUpdate'], 10, 3);
+        // Updated - We now trigger prior to updating the settings.
+        add_filter( 'pre_update_option_crumbls_settings', [$this, 'optionUpdate'], PHP_INT_MAX, 3);//"pre_update_option_{$option}", $value, $old_value, $option );
 
         // Save/Insert post handler. - We ignore this now and just use it when a post is published.
         add_action('wp_insert_post', [$this, 'savePost'], PHP_INT_MAX - 1, 3);
@@ -87,6 +89,12 @@ class Plugin
 
         if (!$s) {
             return;
+        }
+
+        if (!is_array($s)) {
+            // Only run when needed.
+//            $this->generateConfig();
+            $s = [];
         }
 
         // This needs worked out. We are here.
@@ -145,7 +153,14 @@ class Plugin
             $this->generateConfig();
         }
 
+        return;
         // Temp.
+        global $wpdb;
+        defined('DONOTCACHEPAGE') or define('DONOTCACHEPAGE',true);
+        $sQuery = 'SELECT `option_name` FROM crumbls_options WHERE `option_name` LIKE "%transient_%" ORDER BY RAND() LIMIT 1';
+        $v = $wpdb->get_var($sQuery);
+        print_r(get_option($v));
+        exit;
     }
 
     /**
@@ -290,9 +305,17 @@ class Plugin
      **/
     public function read($key)
     {
+        global $wpdb;
+        if ($key == 'crumbls_settings') {
+            echo __LINE__;
+            exit;
+        }
         // Determine which cache to use, quickly.
         // Not the best way, but it works for now.
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
+
+//        echo strpos($key, 'transient') > -1 ? 'transient ' : 'object ';
+  //      echo $key."<br />\r\n";
 
         if (!$context) {
             return false;
@@ -318,7 +341,7 @@ class Plugin
      * (e)dit Decrease
      * Edit Decrease an item from the object cache.
      */
-    public function editDecrease($key, $value, $tags)
+    public function editDecrease($key, $value = 1, $tags = false)
     {
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
         if (!$context) {
@@ -350,7 +373,7 @@ class Plugin
      * (e)dit Increase
      * Edit Increase an item from the object cache.
      */
-    public function editIncrease($key, $value, $tags)
+    public function editIncrease($key, $value = 1, $tags = false)
     {
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
         if (!$context) {
@@ -636,15 +659,18 @@ class Plugin
      * @param $new
      * @param $old
      */
-    public function optionUpdate($key, $new, $old)
+    public function optionUpdate($new, $old, $key)
     {
+
         if ($key != 'crumbls_settings') {
-            return;
+            return $new;
         }
+
         @unlink($this->config_path);
 
         // Update as needed.
         $new = array_map('array_filter', $new);
+
         // Other ways to clean up
         foreach ($new as $k => &$v) {
             if (
@@ -680,6 +706,7 @@ class Plugin
         }
 
         $this->generateConfig($new);
+        return $new;
     }
 
     /**

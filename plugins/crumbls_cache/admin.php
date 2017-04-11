@@ -209,8 +209,12 @@ class Admin extends Plugin
      * @author Chase C. Miller <chase@crumbls.com>
      * @return array
      */
-    protected function getSupported()
+    protected function getSupported($useCached = true)
     {
+        if ($useCached && $temp = $this->read(__METHOD__)) {
+            return $temp;
+        }
+
         // Rewrite to actually check.
         $cm = new CacheManager();
         $ret = [];
@@ -224,6 +228,8 @@ class Admin extends Plugin
                 continue;
             }
         }
+
+        $this->add(__METHOD__, $ret, ['system', 'crumbls'], 1024);
 
         return $ret;
     }
@@ -282,16 +288,6 @@ class Admin extends Plugin
         $path = false;
 
 
-//        print_r($this->getStats());
-
-//print_r();
-        /*
-                $files = ($this->instance) ? $files = $this->getStats()->getInfo() : '';
-
-                if (preg_match('#: (\d+)#', $files, $m)) {
-                    $files = $m[1];
-                }
-        */
         ?>
         <div class="wrap">
             <h1><?php _e('Cache', __NAMESPACE__); ?></h1>
@@ -385,13 +381,13 @@ class Admin extends Plugin
                     ?>
                 </ul>
                 <?php
-                $possible = $this->getSupported();
+                $possible = $this->getSupported(false);
                 $options = get_option('crumbls_settings');
-
-                //                print_r($options);
 
                 foreach ($fields as $k => $v) {
                     printf('<div id="%s" class="ui-tabs-panel">', $k);
+//                    print_r($options[$k]);
+
 
                     echo '<table class="form-table"><tbody>';
                     echo '<tr>';
@@ -445,8 +441,6 @@ class Admin extends Plugin
                         );
                     }
 
-                    for ($i = 0; $i < 10; $i++) {
-                    }
                     echo '</select>';
 
                     echo '</td>';
@@ -519,18 +513,17 @@ class Admin extends Plugin
         foreach ([
                      'cache_time' => 'files',
                      'compress_data' => 'memcache',
-                     'ip' => 'memcache memcached',
+                     //'ip' => 'memcache memcached',
                      'path' => 'files sqlite',
                      'sasl_user' => 'memcache memcached',
                      'sasl_password' => 'memcache memcached',
-                     'host' => 'memcache memcached mongodb',
-                     'port' => 'memcache memcached mongodb',
+                     'host' => 'mongodb',
+                     'port' => 'mongodb',
                      'username' => 'mongodb',
                      'password' => 'mongodb',
                      'timeout' => 'mongodb',
-
+                     'servers' => 'memcache memcached'
                  ] as $field => $class) {
-//            echo $field;
             printf('<tr class="field hidden %s"><th>%s</th><td><input type="text" name="%s" value="%s" /></td></tr>',
                 $class,
                 __($field, __NAMESPACE__),
@@ -538,7 +531,6 @@ class Admin extends Plugin
                 array_key_exists($field, $ref) ? esc_attr($ref[$field]) : ''
             );
         }
-        return;
     }
 
     public

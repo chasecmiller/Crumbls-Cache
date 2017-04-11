@@ -4,7 +4,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 
-
 // error handler function
 function tempErrorHandler($errno, $errstr, $errfile, $errline)
 {
@@ -14,18 +13,24 @@ function tempErrorHandler($errno, $errstr, $errfile, $errline)
         return false;
     }
 
+    // Ignore the common
+    $bn = basename($errfile);
+    if ($bn == 'MemcacheDriverCollisionDetectorTrait.php') {
+        return true;
+    }
+
     switch ($errno) {
         case E_USER_ERROR:
             sendToLog("Fatal: [$errno]  Line $errline File $errfile Version ".PHP_VERSION." OS ".PHP_PS);
             break;
         case E_USER_WARNING:
-            sendToLog("Warning: [$errno] $errstr");
+            sendToLog("Warning: [$errno] Line $errline File $errfile: $errstr");
             break;
         case E_USER_NOTICE:
-            sendToLog("Notice: [$errno] $errstr");
+            sendToLog("Notice: [$errno] Line $errline File $errfile: $errstr");
             break;
         default:
-            sendToLog("Unknown: [$errno] $errstr");
+            sendToLog("Unknown: [$errno] Line $errline File $errfile: $errstr");
     }
 
     /* Don't execute PHP internal error handler */
