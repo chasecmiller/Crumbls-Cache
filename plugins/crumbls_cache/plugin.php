@@ -47,13 +47,16 @@ class Plugin
         add_action('update_option', [$this, 'optionUpdate'], 10, 3);
 
         // Save/Insert post handler. - We ignore this now and just use it when a post is published.
-        add_action('wp_insert_post', array(&$this, 'savePost'), PHP_INT_MAX - 1, 3);
+        add_action('wp_insert_post', [$this, 'savePost'], PHP_INT_MAX - 1, 3);
 
         // Handle single posts.
-        add_action('the_post', array(&$this, 'actionThePost'));
+        add_action('the_post', [$this, 'actionThePost']);
+
+        // Handle comments
+        add_action('comment_post', [$this, 'actionCommentPost'], 10, 3);
 
         // Set expiration times
-        add_action('pre_get_posts', array(&$this, 'actionPreGetPosts'));
+        add_action('pre_get_posts', [$this, 'actionPreGetPosts']);
 
         // On publish
         add_action('publish_post', [&$this, 'postPublish'], 10, 2);
@@ -160,7 +163,7 @@ class Plugin
             if (!isset($wpdb) || !$wpdb) {
                 //	echo 'a';
             }
-            return;
+            //       return;
         }
 
 
@@ -175,12 +178,11 @@ class Plugin
             ];
 
             $args = array_filter(array_intersect_key($_REQUEST, array_flip($allowed)));
-
             /**
              * Get current user's data.
              * Allow override, eventually.
              **/
-            if ( defined('XMLRPC_REQUEST') && XMLRPC_REQUEST ) {
+            if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) {
             } else if (true) {
                 $args['is_logged_in'] = 0;
                 if (!$current_user && $temp = preg_grep('#^wordpress_logged_in_#', array_keys($_COOKIE))) {
@@ -213,6 +215,8 @@ class Plugin
         }
 
         $storage = $this->page->getItem(cache_key);
+        print_r($storage);
+        exit;
         if ($storage->isHit()) {
             echo $storage->get();
             printf('<!-- Cache: %s -->', cache_key);
@@ -389,13 +393,17 @@ class Plugin
     public function delete($key = null, $tags = null)
     {
         if (!$key && !$tags) {
-            echo __LINE__ . ' ' . basename(__FILE__);
-            exit;
-            // Handle.
+            // Nothing was passed.
             return;
         } else if (!$key && $tags) {
-            echo __LINE__ . ' ' . basename(__FILE__);
-            exit;
+            // No key was defined.  Delete anything attached to these tags.
+            foreach ([
+                     'page',
+                     'object',
+                     'transient'
+            ] as $k) {
+                $this->$k->deleteItemsByTags($tags);
+            }
             // Handle.
             return;
         }
@@ -558,6 +566,16 @@ class Plugin
     }
 
     /**
+     * Handles comments.
+     * @param $comment_id
+     * @param $status
+     */
+    public function actionCommentPost($comment_id, $status)
+    {
+        // Not yet implemented.
+    }
+
+    /**
      * Handles pre_get_posts action.
      * We use this just to set our expiration time for archives.
      */
@@ -613,7 +631,7 @@ class Plugin
         // Other ways to clean up
         foreach ($new as $k => &$v) {
             if (
-                array_key_exists('type', $v)
+            array_key_exists('type', $v)
             ) {
                 if (array_key_exists($new, $v['type'])
                 ) {
