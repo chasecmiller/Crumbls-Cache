@@ -13,7 +13,12 @@ function tempErrorHandler($errno, $errstr, $errfile, $errline)
         return false;
     }
 
+
     // Ignore the common
+
+    if (!strpos($errfile, 'crumbls_cache')) {
+        return false;
+    }
     $bn = basename($errfile);
     if ($bn == 'MemcacheDriverCollisionDetectorTrait.php') {
         return true;

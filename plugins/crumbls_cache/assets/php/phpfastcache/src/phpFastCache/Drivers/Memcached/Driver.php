@@ -146,6 +146,9 @@ class Driver extends DriverAbstract
             }
         }
 
+        // debug
+//$servers[] = ['127.0.0.1', 11211];
+
         if (count($servers) < 1) {
             $servers = [
                 ['127.0.0.1', 11211],
@@ -164,6 +167,13 @@ class Driver extends DriverAbstract
                 $this->fallback = true;
             }
         }
+
+        // Settings?
+        $this->instance->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 10);
+        $this->instance->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+        $this->instance->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
+        $this->instance->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
+        $this->instance->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
     }
 
     /********************
