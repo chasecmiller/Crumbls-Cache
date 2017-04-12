@@ -15,34 +15,33 @@ function tempErrorHandler($errno, $errstr, $errfile, $errline)
 
 
     // Ignore the common
-
     if (!strpos($errfile, 'crumbls_cache')) {
         return false;
     }
     $bn = basename($errfile);
     if ($bn == 'MemcacheDriverCollisionDetectorTrait.php') {
-        return true;
+        return false;
     }
 
     switch ($errno) {
         case E_USER_ERROR:
-            sendToLog("Fatal: [$errno]  Line $errline File $errfile Version ".PHP_VERSION." OS ".PHP_PS);
+            sendToLog("Fatal: [$errno]  Line $errline File $errfile Version ".PHP_VERSION." OS ".PHP_PS, $errno);
             break;
         case E_USER_WARNING:
-            sendToLog("Warning: [$errno] Line $errline File $errfile: $errstr");
+            sendToLog("Warning: [$errno] Line $errline File $errfile: $errstr", $errno);
             break;
         case E_USER_NOTICE:
-            sendToLog("Notice: [$errno] Line $errline File $errfile: $errstr");
+            sendToLog("Notice: [$errno] Line $errline File $errfile: $errstr", $errno);
             break;
         default:
-            sendToLog("Unknown: [$errno] Line $errline File $errfile: $errstr");
+            sendToLog("Unknown: [$errno] Line $errline File $errfile: $errstr", $errno);
     }
 
     /* Don't execute PHP internal error handler */
     return true;
 }
 
-function sendToLog($log) {
+function sendToLog($log, $errno = null) {
     if (is_string($log)) {
         $log = [
             'message' => $log,
@@ -54,11 +53,14 @@ function sendToLog($log) {
     if (!array_key_exists('tag', $log)) {
         $log['tag'] = ['crumbls', 'cache'];
     }
+    if ($errno) {
+        $log['tag'][] = $errno;
+    }
     if (!array_key_exists('domain', $log)) {
-        if (defined('COOKIE_DOMAIN')) {
+        if (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) {
             $log['domain'] = COOKIE_DOMAIN;
         } else {
-            $log['domain'] = $_SERVER['SERVER_NAME'];
+            $log['domain'] = get_site_url();
         }
     }
 

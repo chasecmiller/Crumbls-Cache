@@ -212,12 +212,17 @@ class Admin extends Plugin
     protected function getSupported($useCached = true)
     {
         if ($useCached && $temp = $this->read(__METHOD__)) {
-            return $temp;
+            if (is_array($temp)) {
+                return $temp;
+            }
         }
 
         // Rewrite to actually check.
         $cm = new CacheManager();
         $ret = [];
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            trigger_error(var_export($cm->getStaticSystemDrivers(),true), E_USER_WARNING);
+        }
         foreach ($cm->getStaticSystemDrivers() as $driver) {
             try {
                 $temp = $cm->getInstance($driver, []);
