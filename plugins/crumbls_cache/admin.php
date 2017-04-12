@@ -29,8 +29,6 @@ class Admin extends Plugin
     public function actionAdminInit()
     {
 
-        // If wea re
-
         register_setting('crumblsCache', 'crumbls_settings');
 
         // All of these settings.
@@ -220,9 +218,6 @@ class Admin extends Plugin
         // Rewrite to actually check.
         $cm = new CacheManager();
         $ret = [];
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            trigger_error(var_export($cm->getStaticSystemDrivers(),true), E_USER_WARNING);
-        }
         foreach ($cm->getStaticSystemDrivers() as $driver) {
             try {
                 $temp = $cm->getInstance($driver, []);
@@ -366,11 +361,14 @@ class Admin extends Plugin
                 && $e['args']['show_tab'];
             });
 
+
         ?>
         <form action='options.php' method='post'>
 
             <h2>Crumbls Cache</h2>
-
+            <?php
+//            echo '<pre>'.var_export($this->object,true).'</pre>';
+            ?>
             <div class="crumbls-tabs">
                 <ul>
                     <?php
@@ -627,6 +625,5 @@ class Admin extends Plugin
     {
         printf('<p>%s</p>', __('Please provide feedback on this section.', __NAMESPACE__));
     }
-
 
 }

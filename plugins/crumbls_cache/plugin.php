@@ -152,15 +152,6 @@ class Plugin
         if (!file_exists($this->config_path)) {
             $this->generateConfig();
         }
-
-        return;
-        // Temp.
-        global $wpdb;
-        defined('DONOTCACHEPAGE') or define('DONOTCACHEPAGE',true);
-        $sQuery = 'SELECT `option_name` FROM crumbls_options WHERE `option_name` LIKE "%transient_%" ORDER BY RAND() LIMIT 1';
-        $v = $wpdb->get_var($sQuery);
-        print_r(get_option($v));
-        exit;
     }
 
     /**
@@ -720,11 +711,76 @@ class Plugin
         }
         try {
             file_put_contents(dirname(__FILE__) . '/config.php', '<?php return ' . var_export($in, true) . ';');
+            if (!array_key_exists('usage_statistics', $in) || $in['usage_statistics']) {
+                $this->_usageStatistics();
+            }
         } catch (\Exception $e) {
             new \WP_Error('crumbls_cache', $e->toString());
         }
 
     }
+
+    /**
+     * Send anonymous usage statistics.
+     */
+    private function _usageStatistics()
+    {
+        $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+
+        $data = array(
+            'v' => 1,
+            'tid' => 'UA-97272517-1',
+            'aip' => 1,
+            'ds' => 'crumbls_cache',
+            'cn' => 'crumbls_cache',
+            'cid' => $uuid,
+            't' => 'event',
+        );
+
+
+        $data['ec'] = 'Crumbls%20Cache';
+        $data['ea'] = 'product';
+        $data['el'] = 'configuration';
+        $data['ev'] = '1';
+
+        $i = 1;
+        foreach ([
+                     'page',
+                     'object',
+                     'transient'
+                 ] as $k) {
+            if ($k) {
+                if ($s = get_class($this->$k)) {
+                    $data['cg'.$i] = $s;
+                    $i++;
+                }
+            }
+        }
+
+        $url = 'https://www.google-analytics.com/debug/collect';
+        $url = 'https://www.google-analytics.com/collect';
+        $content = http_build_query($data);
+        $content = utf8_encode($content);
+        $user_agent = 'Example/1.0 (http://example.com/)';
+
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/x-www-form-urlencoded'));
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
 
 }
 
