@@ -200,4 +200,19 @@ class Driver extends DriverAbstract
             ->setRawData($stats)
             ->setSize($stats['bytes']);
     }
+
+    /**
+     * Added by Chase C. Miller
+     */
+    public static function getValidOptions()
+    {
+        return [
+            'servers',
+            'opt_connect_timeout',
+            'opt_distribution',
+            'opt_server_failure_limit',
+            'opt_remove_failed_servers',
+            'opt_retry_timeout'
+        ];
+    }
 }

@@ -43,6 +43,19 @@ class Driver extends DriverAbstract
      */
     public function __construct(array $config = [])
     {
+        if (
+            !array_key_exists('path', $config)
+        ||
+            !$config['path']
+        ) {
+            if (defined('WP_CONTENT_DIR')) {
+                $config['path'] = WP_CONTENT_DIR;
+            } else if (preg_match('#^(.*?\/wp-content)\/#i', __FILE__, $m)) {
+                $config['path'] = $m[0];
+            }
+            $config['path'] = rtrim($config['path'], '/').'/cache/crumbls/';
+        }
+
         $this->setup($config);
 
         if (!$this->driverCheck()) {
@@ -185,7 +198,7 @@ class Driver extends DriverAbstract
                 return is_string($optionValue);
                 break;
             case 'htaccess':
-                return is_bool($optionValue);
+                return is_bool($optionValue) || $optionValue == 1 || $optionValue == 0;
                 break;
             default:
                 return false;
@@ -236,4 +249,5 @@ class Driver extends DriverAbstract
 
         return $stat;
     }
+
 }

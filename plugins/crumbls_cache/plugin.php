@@ -4,7 +4,7 @@
 	Plugin URI: http://crumbls.com
 	Description: Caching for WP via PHPFastCache Not for production. Works 100%, just not 100% tested.
 	Author: Chase C. Miller
-	Version: 1.0a
+	Version: 1.1.0a
 	Author URI: http://crumbls.com
 	Text Domain: crumbls\plugins\fastcache
 	Domain Path: /assets/lang
@@ -34,7 +34,6 @@ class Plugin
         require_once('errorhandler.php');
 
 
-
 //        return;
         // Initialize our caching engine.
         $this->init();
@@ -50,7 +49,7 @@ class Plugin
         // Updated.
 //        add_action('update_option', [$this, 'optionUpdate'], 10, 3);
         // Updated - We now trigger prior to updating the settings.
-        add_filter( 'pre_update_option_crumbls_settings', [$this, 'optionUpdate'], PHP_INT_MAX, 3);//"pre_update_option_{$option}", $value, $old_value, $option );
+        add_filter('pre_update_option_crumbls_settings', [$this, 'optionUpdate'], PHP_INT_MAX, 3);//"pre_update_option_{$option}", $value, $old_value, $option );
 
         // Save/Insert post handler. - We ignore this now and just use it when a post is published.
         add_action('wp_insert_post', [$this, 'savePost'], PHP_INT_MAX - 1, 3);
@@ -69,6 +68,18 @@ class Plugin
 
         // Toolbar
         add_action('admin_bar_menu', [$this, 'adminToolbar'], 999);
+
+        // Fallback until we have language files built.
+        add_filter('gettext', function($trans, $text, $dom) {
+            if ($dom !== __NAMESPACE__) {
+                return $trans;
+            }
+            $trans = ucwords($trans);
+            $trans = preg_replace('#[^A-Za-z0-9]#', ' ', $trans);
+            $trans = trim($trans);
+            return $trans;
+        }, 10, 3);
+
     }
 
     /**
@@ -84,7 +95,12 @@ class Plugin
             &&
             is_readable($this->config_path)
         ) {
-            $s = include($this->config_path);
+            try {
+                $s = @include($this->config_path);
+            } catch (\Exception $e) {
+                $s = false;
+                @unlink($this->config_path);
+            }
         }
 
         if (!$s) {
@@ -97,51 +113,34 @@ class Plugin
             $s = [];
         }
 
-        // This needs worked out. We are here.
-        // Setup page cache.
-        if (
-            array_key_exists('crumbls_cache_type_page', $s)
-            &&
-            $s['crumbls_cache_type_page']
-            &&
-            array_key_exists('type', $s['crumbls_cache_type_page'])
-            &&
-            $s['crumbls_cache_type_page']['type']
-        ) {
-            $t = $s['crumbls_cache_type_page']['type'];
-            $this->page = CacheManager::getInstance($t, $s['crumbls_cache_type_page']);
-        }
-
-        unset($s['crumbls_cache_type_page']);
-
         foreach ($s as $k => $v) {
-            // Last word
-            $k = substr($k, strrpos($k, '_') + 1);
-
-            // Simplify this.
             if (
-                $v['type'] === '0'
+                !array_key_exists('enabled', $v)
+                ||
+                !$v['enabled']
+                ||
+                !array_key_exists('type', $v)
             ) {
                 $this->$k = false;
-            } else if (
-                !array_key_exists('type', $v)
-                ||
-                !$v['type']
-                ||
-                $v['type'] == 'crumbls_cache_type_page'
+                continue;
+            } else if (in_array($v['type'],
+                    [
+                        'page',
+                        'object',
+                        'transient'
+                    ])
+                &&
+                $k != $v['type']
             ) {
-                // Set to file.
-                $this->$k = &$this->page;
-            } else if (
-            array_key_exists($v['type'], $s)
-            ) {
-                // Last word
-                $rk = substr($v['type'], strrpos($v['type'], '_') + 1);
+                // Check for other type request.
+                // Not yet implemented.
+                $rk = $v['type'];
                 $this->$k = &$this->$rk;
-            } else {
-                $this->$k = CacheManager::getInstance($v['type'], $v);
+                continue;
             }
+            $this->$k = CacheManager::getInstance($v['type'], $v);
         }
+
     }
 
     /**
@@ -161,6 +160,14 @@ class Plugin
     public function advancedCache()
     {
         // Determine if we should load advanced cache.
+        if (!$this->page) {
+            $message = 'Page cache is disabled';
+            if (function_exists('__')) {
+                $message = __($message, __NAMESPACE__);
+            }
+            printf('<!-- %s -->', $message);
+            return;
+        }
 
         global $wpdb, $current_user;
         if (preg_match('#/wp-(admin|login)#', $_SERVER['REQUEST_URI'])) {
@@ -232,6 +239,9 @@ class Plugin
             echo $storage->get();
             printf('<!-- Cache: %s -->', cache_key);
             exit(1);
+        } else {
+//            print_r($this->page);//$storage);
+//            exit;
         }
 
         if (!$this->tags) {
@@ -249,7 +259,6 @@ class Plugin
             if (is_admin()) {
                 return;
             }
-
 
             // This is being called on the front page.  It should not be.
             if (defined('DONOTCACHEPAGE') && DONOTCACHEPAGE) {
@@ -275,8 +284,11 @@ class Plugin
              * Currently disabled.
              * Page cache clears on edit, add, update, delete.
              */
-//                $CachedString->expiresAfter($expires);
+//            print_r($this->page);
+                $CachedString->expiresAfter(-1);
             $this->page->save($CachedString);
+            echo 'a';
+            exit;
 
             ob_end_flush();
         });
@@ -304,9 +316,6 @@ class Plugin
         // Determine which cache to use, quickly.
         // Not the best way, but it works for now.
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
-
-//        echo strpos($key, 'transient') > -1 ? 'transient ' : 'object ';
-  //      echo $key."<br />\r\n";
 
         if (!$context) {
             return false;
@@ -429,10 +438,10 @@ class Plugin
         } else if (!$key && $tags) {
             // No key was defined.  Delete anything attached to these tags.
             foreach ([
-                     'page',
-                     'object',
-                     'transient'
-            ] as $k) {
+                         'page',
+                         'object',
+                         'transient'
+                     ] as $k) {
                 $this->$k->deleteItemsByTags($tags);
             }
             // Handle.
@@ -652,7 +661,6 @@ class Plugin
      */
     public function optionUpdate($new, $old, $key)
     {
-
         if ($key != 'crumbls_settings') {
             return $new;
         }
@@ -662,40 +670,85 @@ class Plugin
         // Update as needed.
         $new = array_map('array_filter', $new);
 
+        update_option('crumbls_log', [], false);
+
+        set_error_handler(function ($errNo, $errStr, $errFile, $errLine) {
+            // SEND TO WARNING OPTION
+            global $wpdb;
+            $t = get_option('crumbls_log');
+            if (!$t || !is_array($t)) {
+                $t = [];
+            }
+            $e = new \stdClass();
+            $e->no = $errNo;
+            $e->str = __($errStr, __NAMESPACE__);
+            $e->file = $errFile;
+            $e->line = $errLine;
+            $t[] = $e;
+            update_option('crumbls_log', $t, false);
+        });
+
+        $cm = new CacheManager();
+
         // Other ways to clean up
         foreach ($new as $k => &$v) {
-            if (
-            array_key_exists('type', $v)
+            if (!
+                array_key_exists('type', $v)
+                ||
+                !$v['type']
+                ||
+                $v['type'] == 'disabled'
             ) {
-                if (array_key_exists($new, $v['type'])
-                ) {
-                    // Minimize.
-                    $v = [
-                        'type' => $v['type']
-                    ];
-                }
+                $v['type'] = false;
             }
-            if (
-                $v['type'] == 'files'
+
+            if ($v['type']
+                &&
+                in_array($v['type'],
+                    [
+                        'page',
+                        'object',
+                        'transient'
+                    ])
+                &&
+                $v['type'] !== $k
             ) {
-                // Handle files updates.
-                $temp = false;
-                if (!array_key_exists('path', $v)) {
-                    $temp = true;
-                } else if (!is_dir($v['path'])) {
-                    $temp = true;
-                } else if (!is_writable($v['path'])) {
-                    $temp = true;
-                }
-                if ($temp) {
-                    $v['path'] = WP_CONTENT_DIR . '/cache/crumbls/';
-                }
-                if (!array_key_exists('cache_time', $v)) {
-                    $v['cache_time'] = -1;
+                $v = [
+                    'type' => $v['type'],
+                    'enabled' => true
+                ];
+            } else if ($v['type']) {
+                try {
+                    $config = array_intersect_key($v, array_flip(preg_grep('#^' . $v['type'] . '#', array_keys($v))));
+                    if (!$config) {
+                        $v = [
+                            'type' => $v['type'],
+                            'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true
+                        ];
+                    } else {
+                        $i = strlen($v['type']) + 1;
+                        foreach ($config as $ka => $va) {
+                            $config[substr($ka, $i)] = $va;
+                            unset($config[$ka]);
+                        }
+
+                        $temp = $cm->getInstance($v['type'], $config);
+                        foreach ($config as $ka => $va) {
+                            if (!$temp->isValidOption($ka, $va)) {
+                                $v['enabled'] = false;
+                                trigger_error('invalid_setting_for_'.$k.'_'.$ka, E_USER_ERROR);
+                            }
+                        }
+                        $v['enabled'] = array_key_exists('enabled', $v) ? (bool)$v['enabled'] : true;
+                    }
+                } catch (\Exception $e) {
+                    // Invalid setup. Do not enable.
+                    $v['enabled'] = false;
                 }
             }
         }
 
+        restore_error_handler();
         $this->generateConfig($new);
         return $new;
     }
@@ -709,11 +762,68 @@ class Plugin
         if (!$in) {
             $in = get_option('crumbls_settings');
         }
+        /**
+         * We already cleaned this data on a save,
+         * but need to do it again, for now.
+         * That's in case a config file doesn't exist
+         * and we auto generate.
+         */
+        $cm = new CacheManager();
+
+        foreach ($in as $k => &$v) {
+            if (!
+                array_key_exists('type', $v)
+                ||
+                !$v['type']
+                ||
+                $v['type'] == 'disabled'
+            ) {
+                $v['type'] = false;
+            }
+
+            // Doing it all wrong.
+            // Remove invalid.
+            if ($v['type']) {
+                try {
+                    $config = array_intersect_key($v, array_flip(preg_grep('#^' . $v['type'] . '#', array_keys($v))));
+                    if (!$config) {
+                        $v = [
+                            'type' => $v['type'],
+                            'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true
+                        ];
+                    } else {
+                        $i = strlen($v['type']) + 1;
+                        foreach ($config as $ka => $va) {
+                            $config[substr($ka, $i)] = $va;
+                            unset($config[$ka]);
+                        }
+                        $temp = $cm->getInstance($v['type'], $config);
+                        foreach ($config as $ka => $va) {
+                            if (!$temp->isValidOption($ka, $va)) {
+                                $v['enabled'] = false;
+                            }
+                        }
+                        $config = $temp->getConfig();
+                        $config['type'] = $v['type'];
+                        if (array_key_exists('enabled', $v)) {
+                            $config['enabled'] = $v['enabled'];
+                        }
+                        $v = $config;
+                        $v['enabled'] = array_key_exists('enabled', $v) ? (bool)$v['enabled'] : true;
+                    }
+                } catch (\Exception $e) {
+                    // Invalid setup. Do not enable.
+                    $v['enabled'] = false;
+                }
+            }
+        }
         try {
             file_put_contents(dirname(__FILE__) . '/config.php', '<?php return ' . var_export($in, true) . ';');
+            /*
             if (!array_key_exists('usage_statistics', $in) || $in['usage_statistics']) {
                 $this->_usageStatistics();
             }
+            */
         } catch (\Exception $e) {
             new \WP_Error('crumbls_cache', $e->toString());
         }
@@ -757,17 +867,16 @@ class Plugin
                  ] as $k) {
             if ($k) {
                 if ($s = get_class($this->$k)) {
-                    $data['cg'.$i] = $s;
+                    $data['cg' . $i] = $s;
                     $i++;
                 }
             }
         }
 
-        $url = 'https://www.google-analytics.com/debug/collect';
         $url = 'https://www.google-analytics.com/collect';
         $content = http_build_query($data);
         $content = utf8_encode($content);
-        $user_agent = 'Example/1.0 (http://example.com/)';
+        $user_agent = 'CrumblsCache/1.0 (http://example.com/)';
 
 
         $ch = curl_init();
