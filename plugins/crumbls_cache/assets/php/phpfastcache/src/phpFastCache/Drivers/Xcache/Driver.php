@@ -145,4 +145,9 @@ class Driver extends DriverAbstract
             Then reboot your webserver and make sure that the native Xcache ini configuration file does not override your setting.");
         }
     }
+
+    public static function getValidOptions()
+    {
+        return array_keys(self::getConfig());
+    }
 }

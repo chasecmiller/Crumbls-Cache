@@ -47,6 +47,8 @@ class Driver extends DriverAbstract
         } else {
             $this->driverConnect();
         }
+
+
     }
 
     /**
@@ -124,40 +126,40 @@ class Driver extends DriverAbstract
      */
     protected function driverConnect()
     {
-        $server = isset($this->config[ 'redis' ]) ? $this->config[ 'redis' ] : [
-          'host' => '127.0.0.1',
-          'port' => '6379',
-          'password' => '',
-          'database' => '',
+        $server = isset($this->config['redis']) ? $this->config['redis'] : [
+            'host' => '127.0.0.1',
+            'port' => '6379',
+            'password' => '',
+            'database' => '',
         ];
 
         $config = [
-          'host' => $server[ 'host' ],
+            'host' => $server['host'],
         ];
 
-        $port = isset($server[ 'port' ]) ? $server[ 'port' ] : '';
+        $port = isset($server['port']) ? $server['port'] : '';
         if ($port != '') {
-            $config[ 'port' ] = $port;
+            $config['port'] = $port;
         }
 
-        $password = isset($server[ 'password' ]) ? $server[ 'password' ] : '';
+        $password = isset($server['password']) ? $server['password'] : '';
         if ($password != '') {
-            $config[ 'password' ] = $password;
+            $config['password'] = $password;
         }
 
-        $database = isset($server[ 'database' ]) ? $server[ 'database' ] : '';
+        $database = isset($server['database']) ? $server['database'] : '';
         if ($database != '') {
-            $config[ 'database' ] = $database;
+            $config['database'] = $database;
         }
 
-        $timeout = isset($server[ 'timeout' ]) ? $server[ 'timeout' ] : '';
+        $timeout = isset($server['timeout']) ? $server['timeout'] : '';
         if ($timeout != '') {
-            $config[ 'timeout' ] = $timeout;
+            $config['timeout'] = $timeout;
         }
 
-        $read_write_timeout = isset($server[ 'read_write_timeout' ]) ? $server[ 'read_write_timeout' ] : '';
+        $read_write_timeout = isset($server['read_write_timeout']) ? $server['read_write_timeout'] : '';
         if ($read_write_timeout != '') {
-            $config[ 'read_write_timeout' ] = $read_write_timeout;
+            $config['read_write_timeout'] = $read_write_timeout;
         }
 
         $this->instance = new PredisClient($config);
@@ -179,12 +181,17 @@ class Driver extends DriverAbstract
         $info = $this->instance->info();
         $size = (isset($info['Memory']['used_memory']) ? $info['Memory']['used_memory'] : 0);
         $version = (isset($info['Server']['redis_version']) ? $info['Server']['redis_version'] : 0);
-        $date = (isset($info['Server'][ 'uptime_in_seconds' ]) ? (new \DateTime())->setTimestamp(time() - $info['Server'][ 'uptime_in_seconds' ]) : 'unknown date');
+        $date = (isset($info['Server']['uptime_in_seconds']) ? (new \DateTime())->setTimestamp(time() - $info['Server']['uptime_in_seconds']) : 'unknown date');
 
         return (new driverStatistic())
-          ->setData(implode(', ', array_keys($this->itemInstances)))
-          ->setRawData($this->instance->info())
-          ->setSize($size)
-          ->setInfo(sprintf("The Redis daemon v%s is up since %s.\n For more information see RawData. \n Driver size includes the memory allocation size.", $version, $date->format(DATE_RFC2822)));
+            ->setData(implode(', ', array_keys($this->itemInstances)))
+            ->setRawData($this->instance->info())
+            ->setSize($size)
+            ->setInfo(sprintf("The Redis daemon v%s is up since %s.\n For more information see RawData. \n Driver size includes the memory allocation size.", $version, $date->format(DATE_RFC2822)));
+    }
+
+    public static function getValidOptions()
+    {
+        return array_keys(self::getConfig());
     }
 }

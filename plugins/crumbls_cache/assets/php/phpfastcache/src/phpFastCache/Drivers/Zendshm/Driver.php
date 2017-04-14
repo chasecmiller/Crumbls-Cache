@@ -146,4 +146,9 @@ class Driver extends DriverAbstract
                 ->setSize(0);
         }
     }
+
+    public static function getValidOptions()
+    {
+        return array_keys(self::getConfig());
+    }
 }

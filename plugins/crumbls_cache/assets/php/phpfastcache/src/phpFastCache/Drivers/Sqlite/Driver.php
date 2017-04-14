@@ -81,6 +81,7 @@ class Driver extends DriverAbstract
                 $this->driverConnect();
             }
         }
+
     }
 
     /**
@@ -427,5 +428,21 @@ class Driver extends DriverAbstract
     public function __sleep()
     {
         return array_diff(array_keys(get_object_vars($this)), ['indexing', 'instance']);
+    }
+
+    /**
+     * Get options
+     * @return array
+     */
+    public static function getValidOptions() {
+        return ['securityKey','defaultTtl','default_chmod','path', 'fallback', 'compress_data'];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRequiredOptions()
+    {
+        return [];
     }
 }

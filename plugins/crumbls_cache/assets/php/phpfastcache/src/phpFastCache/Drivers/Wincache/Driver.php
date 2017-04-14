@@ -135,4 +135,10 @@ class Driver extends DriverAbstract
           ->setData(implode(', ', array_keys($this->itemInstances)))
           ->setRawData($memInfo);
     }
+
+
+    public static function getValidOptions()
+    {
+        return array_keys(self::getConfig());
+    }
 }

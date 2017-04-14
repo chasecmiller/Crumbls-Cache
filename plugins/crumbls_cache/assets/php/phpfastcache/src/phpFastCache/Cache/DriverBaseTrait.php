@@ -69,7 +69,11 @@ trait DriverBaseTrait
      */
     public function getConfig()
     {
-        return $this->config;
+        try {
+            return $this->config;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**

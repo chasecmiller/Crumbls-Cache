@@ -65,4 +65,20 @@ abstract class DriverAbstract implements ExtendedCacheItemPoolInterface
      */
     abstract protected function driverDelete(CacheItemInterface $item);
 
+    /**
+     * Get options
+     * @return array
+     */
+    public static function getValidOptions() {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRequiredOptions()
+    {
+        return [];
+    }
+
 }

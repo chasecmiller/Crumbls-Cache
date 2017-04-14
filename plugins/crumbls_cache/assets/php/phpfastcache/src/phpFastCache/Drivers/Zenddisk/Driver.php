@@ -138,4 +138,10 @@ class Driver extends DriverAbstract
 
         return $stat;
     }
+
+
+    public static function getValidOptions()
+    {
+        return array_keys(self::getConfig());
+    }
 }

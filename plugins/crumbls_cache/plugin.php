@@ -120,15 +120,13 @@ class Plugin
                 !$v['enabled']
                 ||
                 !array_key_exists('type', $v)
+                ||
+                !$v['type']
             ) {
                 $this->$k = false;
                 continue;
             } else if (in_array($v['type'],
-                    [
-                        'page',
-                        'object',
-                        'transient'
-                    ])
+                    $this->getTypes())
                 &&
                 $k != $v['type']
             ) {
@@ -240,8 +238,7 @@ class Plugin
             printf('<!-- Cache: %s -->', cache_key);
             exit(1);
         } else {
-//            print_r($this->page);//$storage);
-//            exit;
+            echo '<!-- not cached. -->';
         }
 
         if (!$this->tags) {
@@ -285,10 +282,8 @@ class Plugin
              * Page cache clears on edit, add, update, delete.
              */
 //            print_r($this->page);
-                $CachedString->expiresAfter(-1);
+            $CachedString->expiresAfter(-1);
             $this->page->save($CachedString);
-            echo 'a';
-            exit;
 
             ob_end_flush();
         });
@@ -437,11 +432,7 @@ class Plugin
             return;
         } else if (!$key && $tags) {
             // No key was defined.  Delete anything attached to these tags.
-            foreach ([
-                         'page',
-                         'object',
-                         'transient'
-                     ] as $k) {
+            foreach ($this->getTypes() as $k) {
                 $this->$k->deleteItemsByTags($tags);
             }
             // Handle.
@@ -638,11 +629,29 @@ class Plugin
             return;
         }
 
+        if (!$this->page && !$this->object && !$this->transient) {
+            return;
+        }
+
         $wp_admin_bar->add_menu([
             'id' => 'crumbls_cache',
             'title' => __('Cache', __NAMESPACE__),
             'href' => admin_url('options-general.php?page=cache')
         ]);
+
+
+        foreach($this->getTypes() as $k) {
+            if (!$k) {
+                continue;
+            }
+            // Category, archive, etc?
+            $wp_admin_bar->add_menu([
+                'id' => 'crumbls_cache_'.$k,
+                'parent' => 'crumbls_cache',
+                'title' => __('Clear '.$k, __NAMESPACE__),
+                'href' => admin_url('admin.php?page=cache&action=clear'.ucwords($k).'&key=' . time())
+            ]);
+        }
 
         // Category, archive, etc?
         $wp_admin_bar->add_menu([
@@ -651,6 +660,7 @@ class Plugin
             'title' => __('Clear all', __NAMESPACE__),
             'href' => admin_url('admin.php?page=cache&action=clearAll&key=' . time())
         ]);
+
     }
 
     /**
@@ -705,11 +715,7 @@ class Plugin
             if ($v['type']
                 &&
                 in_array($v['type'],
-                    [
-                        'page',
-                        'object',
-                        'transient'
-                    ])
+                    $this->getTypes())
                 &&
                 $v['type'] !== $k
             ) {
@@ -831,6 +837,14 @@ class Plugin
     }
 
     /**
+     * Get cache types
+     * @return array
+     */
+    protected function getTypes() {
+        return ['page','object','transient'];
+    }
+
+    /**
      * Send anonymous usage statistics.
      */
     private function _usageStatistics()
@@ -860,11 +874,7 @@ class Plugin
         $data['ev'] = '1';
 
         $i = 1;
-        foreach ([
-                     'page',
-                     'object',
-                     'transient'
-                 ] as $k) {
+        foreach ($this->getTypes() as $k) {
             if ($k) {
                 if ($s = get_class($this->$k)) {
                     $data['cg' . $i] = $s;

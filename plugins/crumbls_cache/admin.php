@@ -154,6 +154,17 @@ class Admin extends Plugin
             return;
         }
 
+        if (
+            array_key_exists('action', $_REQUEST)
+            &&
+            strpos($_REQUEST['action'], 'clear') === 0
+            &&
+            method_exists($this, '_' . $_REQUEST['action'])
+        ) {
+            $k = '_' . $_REQUEST['action'];
+            call_user_func([$this, $k]);
+        }
+
         ?>
         <form action='options.php' method='post'>
             <div class="wrap">
@@ -161,9 +172,17 @@ class Admin extends Plugin
                 <p>Admin rewrite from scratch.</p>
                 <?php
                 //            echo '<pre>'.var_export($this->object,true).'</pre>';
-                $tabs = ['page', 'object', 'transient'];
+                $tabs = $this->getTypes();
                 $supported = $this->getSupported();
                 $options = get_option('crumbls_settings');
+                foreach($tabs as $k) {
+                    if ($this->$k) {
+                        printf('<a href="%s" class="button">%s</a> ',
+                            admin_url('admin.php?page=cache&action=clear'.ucwords($k).'&key=' . time()),
+                            __('Clear '.$k.' Cache',__NAMESPACE__)
+                        );
+                    }
+                }
                 ?>
                 <div class="crumbls-tabs">
                     <ul>
@@ -235,6 +254,15 @@ class Admin extends Plugin
                             }
                         }
                         echo '</table>';
+                        if ($this->$pane) {
+                            $ref = $this->$pane;
+                            if (method_exists($ref, 'getStats')) {
+                                printf('<h2>%s</h2>',
+                                    __('Statistics', __NAMESPACE__)
+                                );
+                                echo $ref->getStats()->getInfo();
+                            }
+                        }
                         echo '</div>';
                     }
                     ?>
@@ -276,6 +304,74 @@ class Admin extends Plugin
         if (!$t) {
             return;
         }
-        print_r($t);
+//        print_r($t);
     }
+
+    /**
+     * Clear page cache
+     */
+    private function _clearPage()
+    {
+        if (!preg_match('#.*([A-Z].*?)$#', __METHOD__, $k)) {
+            return;
+        }
+        $k = strtolower($k[1]);
+        return $this->clearCache($k);
+    }
+
+    /**
+     * Clear object cache
+     */
+    private function _clearObject()
+    {
+        if (!preg_match('#.*([A-Z].*?)$#', __METHOD__, $k)) {
+            return;
+        }
+        $k = strtolower($k[1]);
+        return $this->clearCache($k);
+    }
+
+    /**
+     * Clear transient cache
+     */
+    private function _clearTransient()
+    {
+        if (!preg_match('#.*([A-Z].*?)$#', __METHOD__, $k)) {
+            return;
+        }
+        $k = strtolower($k[1]);
+        return $this->clearCache($k);
+    }
+
+
+    /**
+     * Clear cache
+     * @param bool $specific
+     */
+    private function clearCache($specific = false)
+    {
+        $p = $this->getTypes();
+
+
+        if ($specific) {
+            if (!in_array($specific, $p)) {
+                return false;
+            }
+            if (!$this->$specific) {
+                return false;
+            }
+            return $this->$specific->clear();
+        }
+        $i = 0;
+        foreach ($p as $k) {
+            if ($this->$k) {
+                if ($this->$k->clear()) {
+                    $i++;
+                }
+            }
+        }
+        return (bool)$i;
+
+    }
+
 }
