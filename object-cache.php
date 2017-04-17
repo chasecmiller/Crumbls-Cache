@@ -3,6 +3,7 @@
 * Added by Chase C. Miller
 * Caching Engine.
 **/
+defined('ABSPATH') or exit(1);
 
 global $cache;
 

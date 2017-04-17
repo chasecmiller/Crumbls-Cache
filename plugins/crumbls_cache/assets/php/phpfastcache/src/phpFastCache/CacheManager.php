@@ -57,15 +57,15 @@ class CacheManager
      * @var array
      */
     protected static $config = [
-      'securityKey' => 'auto',// The securityKey that will be used to create sub-directory
-      'ignoreSymfonyNotice' => false,// Ignore Symfony notice for Symfony project which do not makes use of PhpFastCache's Symfony Bundle
-      'defaultTtl' => 900,// Default time-to-live in second
-      'htaccess' => true,// Auto-generate .htaccess if tit is missing
-      'default_chmod' => 0777, // 0777 recommended
-      'path' => '',// if not set will be the value of sys_get_temp_dir()
-      'fallback' => false, //Fall back when old driver is not support
-      'limited_memory_each_object' => 4096, // maximum size (bytes) of object store in memory
-      'compress_data' => false, // compress stored data, if the backend supports it
+        'securityKey' => 'auto',// The securityKey that will be used to create sub-directory
+        'ignoreSymfonyNotice' => false,// Ignore Symfony notice for Symfony project which do not makes use of PhpFastCache's Symfony Bundle
+        'defaultTtl' => 900,// Default time-to-live in second
+        'htaccess' => true,// Auto-generate .htaccess if tit is missing
+        'default_chmod' => 0777, // 0777 recommended
+        'path' => '',// if not set will be the value of sys_get_temp_dir()
+        'fallback' => false, //Fall back when old driver is not support
+        'limited_memory_each_object' => 4096, // maximum size (bytes) of object store in memory
+        'compress_data' => false, // compress stored data, if the backend supports it
     ];
 
     /**
@@ -97,30 +97,30 @@ class CacheManager
         }
 
         $instance = crc32($driver . serialize($config));
-        if (!isset(self::$instances[ $instance ])) {
+        if (!isset(self::$instances[$instance])) {
             $badPracticeOmeter[$driver] = 1;
-            if(!$config['ignoreSymfonyNotice'] && interface_exists('Symfony\Component\HttpKernel\KernelInterface') && !class_exists('phpFastCache\Bundle\phpFastCacheBundle')){
+            if (!$config['ignoreSymfonyNotice'] && interface_exists('Symfony\Component\HttpKernel\KernelInterface') && !class_exists('phpFastCache\Bundle\phpFastCacheBundle')) {
                 trigger_error('A Symfony Bundle to make the PhpFastCache integration more easier is now available here: https://github.com/PHPSocialNetwork/phpfastcache-bundle', E_USER_NOTICE);
             }
             $class = self::getNamespacePath() . $driver . '\Driver';
-            try{
-                self::$instances[ $instance ] = new $class($config);
-            }catch(phpFastCacheDriverCheckException $e){
+            try {
+                self::$instances[$instance] = new $class($config);
+            } catch (phpFastCacheDriverCheckException $e) {
                 $fallback = self::standardizeDriverName($config['fallback']);
-                if($fallback && $fallback !== $driver){
+                if ($fallback && $fallback !== $driver) {
                     $class = self::getNamespacePath() . $fallback . '\Driver';
-                    self::$instances[ $instance ] = new $class($config);
+                    self::$instances[$instance] = new $class($config);
                     trigger_error(sprintf('The "%s" driver is unavailable at the moment, the fallback driver "%s" has been used instead.', $driver, $fallback), E_USER_WARNING);
-                }else{
+                } else {
                     throw new phpFastCacheDriverCheckException($e->getMessage(), $e->getCode(), $e);
                 }
             }
-        } else if(++$badPracticeOmeter[$driver] >= 5){
-           trigger_error('[' . $driver . '] Calling many times CacheManager::getInstance() for already instanced drivers is a bad practice and have a significant impact on performances.
+        } else if (++$badPracticeOmeter[$driver] >= 5) {
+            trigger_error('[' . $driver . '] Calling many times CacheManager::getInstance() for already instanced drivers is a bad practice and have a significant impact on performances.
            See https://github.com/PHPSocialNetwork/phpfastcache/wiki/[V5]-Why-calling-getInstance%28%29-each-time-is-a-bad-practice-%3F');
         }
 
-        return self::$instances[ $instance ];
+        return self::$instances[$instance];
     }
 
     /**
@@ -153,7 +153,7 @@ class CacheManager
      */
     public static function __callStatic($name, $arguments)
     {
-        $options = (array_key_exists(0, $arguments) && is_array($arguments) ? $arguments[ 0 ] : []);
+        $options = (array_key_exists(0, $arguments) && is_array($arguments) ? $arguments[0] : []);
 
         return self::getInstance($name, $options);
     }
@@ -206,9 +206,9 @@ class CacheManager
     {
         if (is_array($name)) {
             self::$config = array_merge(self::$config, $name);
-        } else if (is_string($name)){
-            self::$config[ $name ] = $value;
-        }else{
+        } else if (is_string($name)) {
+            self::$config[$name] = $value;
+        } else {
             throw new \InvalidArgumentException('Invalid variable type: $name');
         }
     }
@@ -226,25 +226,19 @@ class CacheManager
      */
     public static function getStaticSystemDrivers()
     {
-        return [
-          'Sqlite',
-          'Files',
-          'Apc',
-          'Apcu',
-          'Memcache',
-          'Memcached',
-          'Couchbase',
-          'Mongodb',
-          'Predis',
-          'Redis',
-          'Ssdb',
-          'Leveldb',
-          'Wincache',
-          'Xcache',
-          'Zenddisk',
-          'Zendshm',
-          'Devnull',
-        ];
+        // Modified by Chase C. Miller to list all folders in this folder to try and allow for expansion.
+        $ret = array_map(function ($e) {
+            return basename($e);
+        }, array_filter(glob(dirname(__FILE__) . '/Drivers/*'), 'is_dir'));
+        $ret = array_diff(
+            $ret,
+            [
+                'Devtrue',
+                'Devfalse',
+                'Cookie'
+            ]
+        );
+        return $ret;
     }
 
     /**

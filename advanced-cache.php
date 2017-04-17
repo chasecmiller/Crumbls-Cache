@@ -4,6 +4,8 @@
 * Caching Engine.
 **/
 
+defined('ABSPATH') or exit(1);
+
 global $cache;
 
 $file = dirname(__FILE__).'/plugins/crumbls_cache/plugin.php';
