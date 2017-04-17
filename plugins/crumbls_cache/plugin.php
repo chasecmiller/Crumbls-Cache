@@ -899,7 +899,7 @@ class Plugin
 
 }
 
-require_once(dirname(__FILE__) . '/assets/php/phpfastcache/src/autoload.php');
+require_once(dirname(__FILE__) . '/assets/php/autoload.php');
 
 if (is_admin()) {
     // No admin side yet.
@@ -908,3 +908,4 @@ if (is_admin()) {
 } else {
     $cache = new Plugin();
 }
+

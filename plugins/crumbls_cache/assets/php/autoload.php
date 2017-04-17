@@ -2,6 +2,7 @@
 /**
  *
  * This file is part of phpFastCache.
+ * Heavily modified by Chase C. Miller
  *
  * @license MIT License (MIT)
  *
@@ -9,18 +10,21 @@
  *
  * @author Khoa Bui (khoaofgod)  <khoaofgod@gmail.com> http://www.phpfastcache.com
  * @author Georges.L (Geolim4)  <contact@geolim4.com>
+ * @author Chase C. Miller ( chasemiller ) <chase@crumbls.com>
  *
  */
 
-define('PFC_PHP_EXT', 'php');
-define('PFC_BIN_DIR', __DIR__ . '/../bin/');
+
+defined('PFC_PHP_EXT') || define('PFC_PHP_EXT', 'php');
+defined('PFC_BIN_DIR') || define('PFC_BIN_DIR', __DIR__ . '/phpFastCache/Bin/');
 
 /**
  * Register Autoload
  */
 spl_autoload_register(function ($entity) {
     $module = explode('\\', $entity, 2);
-    if (!in_array($module[ 0 ], ['phpFastCache', 'Psr'])) {
+    if (!in_array($module[ 0 ], ['crumbls', 'phpFastCache', 'Psr'])) {
+        //exit;
         /**
          * Not a part of phpFastCache file
          * then we return here.
@@ -33,6 +37,14 @@ spl_autoload_register(function ($entity) {
             require_once $path;
         }else{
             trigger_error('Cannot locate the Psr/Cache files', E_USER_ERROR);
+        }
+        return;
+    } else if (strpos($entity, 'crumbls\\') === 0) {
+        $path = dirname(__FILE__).'/'.$module[1].'/'.$module[1].'.php';
+        if (is_readable($path)) {
+            require_once $path;
+        }else{
+            trigger_error('Cannot locate the class: '.$module[1], E_USER_ERROR);
         }
         return;
     }

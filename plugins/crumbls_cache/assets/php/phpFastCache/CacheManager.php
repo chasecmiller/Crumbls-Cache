@@ -238,6 +238,11 @@ class CacheManager
                 'Cookie'
             ]
         );
+
+        // Process any other removals
+
+        // Memcached & memcache
+
         return $ret;
     }
 
