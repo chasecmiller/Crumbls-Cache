@@ -239,9 +239,17 @@ class CacheManager
             ]
         );
 
-        // Process any other removals
+        // Clean up others.
 
         // Memcached & memcache
+        $i = array_search('Memcache', $ret);
+        if (
+            in_array('Memcached', $ret)
+            &&
+            $i >= 0
+        ) {
+            unset($ret[$i]);
+        }
 
         return $ret;
     }

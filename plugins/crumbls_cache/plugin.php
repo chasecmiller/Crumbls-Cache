@@ -66,7 +66,7 @@ class Plugin
         add_action('admin_bar_menu', [$this, 'adminToolbar'], 999);
 
         // Fallback until we have language files built.
-        add_filter('gettext', function($trans, $text, $dom) {
+        add_filter('gettext', function ($trans, $text, $dom) {
             if ($dom !== __NAMESPACE__) {
                 return $trans;
             }
@@ -100,39 +100,38 @@ class Plugin
         }
 
         if (!$s) {
+            @unlink($this->config_path);
             return;
         }
 
+        // Set default.
         if (!is_array($s)) {
             // Only run when needed.
 //            $this->generateConfig();
             $s = [];
         }
 
+        $s = array_intersect_key($s, array_flip($this->getTypes()));
+        $s = array_filter($s, function ($e) {
+            return array_key_exists('enabled', $e)
+            && $e['enabled']
+            && array_key_exists('type', $e)
+            && $e['type'];
+        });
+
         foreach ($s as $k => $v) {
+            // Check for other type request.
+            // Not yet implemented.
             if (
-                !array_key_exists('enabled', $v)
-                ||
-                !$v['enabled']
-                ||
-                !array_key_exists('type', $v)
-                ||
-                !$v['type']
-            ) {
-                $this->$k = false;
-                continue;
-            } else if (in_array($v['type'],
-                    $this->getTypes())
+                in_array($v['type'], $this->getTypes())
                 &&
-                $k != $v['type']
+                $v['type'] !== $k
             ) {
-                // Check for other type request.
-                // Not yet implemented.
-                $rk = $v['type'];
-                $this->$k = &$this->$rk;
-                continue;
+                $ref = $v['type'];
+                $this->$k = &$this->$ref;
+            } else {
+                $this->$k = CacheManager::getInstance($v['type'], $v);
             }
-            $this->$k = CacheManager::getInstance($v['type'], $v);
         }
 
     }
@@ -225,6 +224,7 @@ class Plugin
             } else {
                 define('cache_key', md5(serialize($args)));
             }
+
         }
 
         $storage = $this->page->getItem(cache_key);
@@ -241,7 +241,8 @@ class Plugin
             $this->tags = ['/' . trim(explode('?', $_SERVER['REQUEST_URI'], 2)[0], '/')];
         }
 
-        ob_start(); // Start the output buffer
+        //ob_start(); // Start the output buffer
+        ob_start('ob_gzhandler') || ob_start();
 
         // Register shutdown function.
         register_shutdown_function(function () {
@@ -268,7 +269,12 @@ class Plugin
             $this->tags = array_unique($this->tags);
 
             $CachedString = $this->page->getItem(cache_key);
-            $CachedString->set(ob_get_contents());
+
+            printf('<!-- Cache created %s -->', date('Y-m-d H:i:s'));
+
+            // If you want to compress html, this is the place.
+            $CachedString->set(trim(ob_get_contents()));
+
             if ($this->tags) {
                 $CachedString->setTags($this->tags);
             }
@@ -277,8 +283,8 @@ class Plugin
              * Currently disabled.
              * Page cache clears on edit, add, update, delete.
              */
-//            print_r($this->page);
             $CachedString->expiresAfter(-1);
+
             $this->page->save($CachedString);
 
             ob_end_flush();
@@ -300,10 +306,12 @@ class Plugin
     public function read($key)
     {
         global $wpdb;
+
         if ($key == 'crumbls_settings') {
             echo __LINE__;
             exit;
         }
+
         // Determine which cache to use, quickly.
         // Not the best way, but it works for now.
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
@@ -566,7 +574,6 @@ class Plugin
 
         $this->tags = array_unique($this->tags);
 
-//        wp_mail('cmiller@bizwest.com', 'check insert 2', var_export($post,true).' '.var_export($this->tags,true));
         $this->delete(null, $this->tags);
     }
 
@@ -636,16 +643,16 @@ class Plugin
         ]);
 
 
-        foreach($this->getTypes() as $k) {
+        foreach ($this->getTypes() as $k) {
             if (!$k) {
                 continue;
             }
             // Category, archive, etc?
             $wp_admin_bar->add_menu([
-                'id' => 'crumbls_cache_'.$k,
+                'id' => 'crumbls_cache_' . $k,
                 'parent' => 'crumbls_cache',
-                'title' => __('Clear '.$k, __NAMESPACE__),
-                'href' => admin_url('admin.php?page=cache&action=clear'.ucwords($k).'&key=' . time())
+                'title' => __('Clear ' . $k, __NAMESPACE__),
+                'href' => admin_url('admin.php?page=cache&action=clear' . ucwords($k) . '&key=' . time())
             ]);
         }
 
@@ -738,7 +745,7 @@ class Plugin
                         foreach ($config as $ka => $va) {
                             if (!$temp->isValidOption($ka, $va)) {
                                 $v['enabled'] = false;
-                                trigger_error('invalid_setting_for_'.$k.'_'.$ka, E_USER_ERROR);
+                                trigger_error('invalid_setting_for_' . $k . '_' . $ka, E_USER_ERROR);
                             }
                         }
                         $v['enabled'] = array_key_exists('enabled', $v) ? (bool)$v['enabled'] : true;
@@ -761,9 +768,14 @@ class Plugin
      */
     protected function generateConfig($in = null)
     {
+        if (!function_exists('get_option')) {
+            return;
+        }
+
         if (!$in) {
             $in = get_option('crumbls_settings');
         }
+
         /**
          * We already cleaned this data on a save,
          * but need to do it again, for now.
@@ -821,11 +833,9 @@ class Plugin
         }
         try {
             file_put_contents(dirname(__FILE__) . '/config.php', '<?php return ' . var_export($in, true) . ';');
-            /*
             if (!array_key_exists('usage_statistics', $in) || $in['usage_statistics']) {
                 $this->_usageStatistics();
             }
-            */
         } catch (\Exception $e) {
             new \WP_Error('crumbls_cache', $e->toString());
         }
@@ -836,8 +846,9 @@ class Plugin
      * Get cache types
      * @return array
      */
-    protected function getTypes() {
-        return ['page','object','transient'];
+    protected function getTypes()
+    {
+        return ['page', 'object', 'transient'];
     }
 
     /**
