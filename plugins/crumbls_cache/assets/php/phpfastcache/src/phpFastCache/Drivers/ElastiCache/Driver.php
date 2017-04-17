@@ -119,13 +119,13 @@ class Driver extends DriverAbstract
         ||
         !$this->config['configuration_endpoint']
             ||
-        !preg_match('#^(.*?):(\d+)$#', $this->config['configuration_endpoint'], $this->config['configuration_endpoint'])
+        !preg_match('#^(.*?):(\d+)$#', $this->config['configuration_endpoint'], $temp)
         ) {
             return false;
         }
 
             try {
-                if (!$this->instance->addServer($this->config['configuration_endpoint'][1], $this->config['configuration_endpoint'][2])) {
+                if (!$this->instance->addServer($temp[1], $temp[2])) {
                     $this->fallback = true;
                 }
 //                if (!empty($server['sasl_user']) && !empty($server['sasl_password'])) {

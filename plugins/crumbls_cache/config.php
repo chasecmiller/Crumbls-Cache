@@ -15,22 +15,12 @@
   ),
   'object' => 
   array (
-    'securityKey' => 'auto',
-    'ignoreSymfonyNotice' => false,
-    'defaultTtl' => 900,
-    'htaccess' => true,
-    'default_chmod' => 511,
-    'path' => '',
-    'fallback' => false,
-    'limited_memory_each_object' => 4096,
-    'compress_data' => false,
-    'servers' => 'crumbls-test.tnfo7n.0001.usw2.cache.amazonaws.com:11211',
-    'type' => 'memcached',
-    'enabled' => true,
+    'type' => false,
+    'enabled' => false,
   ),
   'transient' => 
   array (
-    'type' => 'object',
+    'type' => false,
     'enabled' => true,
   ),
 );

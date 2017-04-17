@@ -48,3 +48,6 @@ Temporary Items
 *.xml
 .idea/deployment.xml
 *.xml
+
+# Config.php file
+plugins/crumbls_cache/config.php

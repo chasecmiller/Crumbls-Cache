@@ -31,10 +31,6 @@ class Plugin
 
     public function __construct()
     {
-        require_once('errorhandler.php');
-
-
-//        return;
         // Initialize our caching engine.
         $this->init();
 
