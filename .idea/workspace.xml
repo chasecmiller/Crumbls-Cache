@@ -1,125 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2d326bda-3e3d-425a-8cc0-486e37643c04" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/errorLog/errorLog.php" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/.codeclimate.yml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/.scrutinizer.yml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/.travis.yml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/ci/install_dependencies.sh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/ci/run_tests.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/LICENSE.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/README.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/composer.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/src/CacheException.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/src/CacheItemInterface.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/src/CacheItemPoolInterface.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/legacy/Psr/Cache/src/InvalidArgumentException.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/stubs/leveldb/README.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/stubs/leveldb/stub.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/bin/stubs/xcache/stub.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/composer.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/composer.lock" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/TestingFunctions.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/apc.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/cookie.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/couchbase.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/decrement.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/extendedPhpFastCache.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/files.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/increment.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/index.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/legacy.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/memcache.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/memcached.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/mongodb.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/phpinfo.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/predis.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/redis.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/sqlite.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/ssdb.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/tagsMethods.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/xcache.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/zend_disk.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/examples/zend_shm.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/autoload.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/.htaccess" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Api.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Cache/DriverBaseTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Cache/ExtendedCacheItemInterface.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Cache/ExtendedCacheItemPoolInterface.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Cache/ItemBaseTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/CacheManager.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/ClassNamespaceResolverTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/DriverAbstract.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/ExtendedCacheItemPoolTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/MemcacheDriverCollisionDetectorTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/PathSeekerTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Core/StandardPsr6StructureTrait.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Apc/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Apc/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Apcu/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Apcu/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Cookie/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Cookie/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Couchbase/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Couchbase/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Devfalse/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Devfalse/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Devnull/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Devnull/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Devtrue/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Devtrue/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/ElastiCache/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/ElastiCache/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Files/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Files/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Leveldb/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Leveldb/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcache/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcache/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcached/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Memcached/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Mongodb/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Mongodb/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Predis/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Predis/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Redis/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Redis/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Sqlite/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Sqlite/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Ssdb/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Ssdb/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Wincache/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Wincache/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Xcache/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Xcache/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Zenddisk/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Zenddisk/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Zendshm/Driver.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Drivers/Zendshm/Item.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Entities/driverStatistic.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Exceptions/phpFastCacheCoreException.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Exceptions/phpFastCacheDriverCheckException.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Exceptions/phpFastCacheDriverException.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Proxy/phpFastCacheAbstractProxy.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Util/Directory.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/Util/Languages.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/src/phpFastCache/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/AbstractProxy.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/AttachingDetachingMethods.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/Autoload.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/NewCacheInstance.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/Psr6InterfaceImplements.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/ReadWriteOperations.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/SyntaxChecker.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/issues/Github-373.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/tests/issues/Github-392.test.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/assets/php/phpfastcache/var/php/conf/phpfastcache.ini" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/errorhandler.php" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" afterPath="$PROJECT_DIR$/plugins/crumbls_cache/plugin.php" />
-    </list>
+    <list default="true" id="2d326bda-3e3d-425a-8cc0-486e37643c04" name="Default" comment="" />
     <ignored path="Crumbls-Cache.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
@@ -384,62 +266,6 @@
               <option name="myItemId" value="assets" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="php" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Crumbls-Cache" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Crumbls-Cache" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="plugins" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="crumbls_cache" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="assets" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="php" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="errorLog" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Crumbls-Cache" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Crumbls-Cache" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="plugins" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="crumbls_cache" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="assets" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
@@ -522,8 +348,8 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Remote Host" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32708332" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32708332" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32708332" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32708332" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32896176" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
