@@ -4,7 +4,7 @@
 	Plugin URI: http://crumbls.com
 	Description: Caching for WP via PHPFastCache Not for production. Works 100%, just not 100% tested.
 	Author: Chase C. Miller
-	Version: 1.1.0a
+	Version: 2.0.1a
 	Author URI: http://crumbls.com
 	Text Domain: crumbls\plugins\fastcache
 	Domain Path: /assets/lang
@@ -17,6 +17,7 @@ use phpFastCache\CacheManager;
 defined('ABSPATH') or exit(1);
 
 global $cache;
+
 
 class Plugin
 {
@@ -38,7 +39,8 @@ class Plugin
         if (!function_exists('add_action')) {
             return;
         }
-
+//});
+//        register_deactivation_hook(__FILE__, array($this, 'hook_deactivate'));
 
 //        global $wp_filter;
 
@@ -89,6 +91,19 @@ class Plugin
      */
     private function init()
     {
+        global $wp_plugin_paths;
+
+        if (!is_array($wp_plugin_paths)) {
+            $wp_plugin_paths = [];
+        }
+
+        if (function_exists('wp_plugin_directory_constants')) {
+//            wp_plugin_directory_constants();
+        }
+
+        defined('WP_PLUGIN_DIR') or define('WP_PLUGIN_DIR', rtrim(WP_CONTENT_DIR,'/').'/plugins');
+        defined('WPMP_PLUGIN_DIR') or define( 'WPMU_PLUGIN_DIR', rtrim(WP_CONTENT_DIR, '/') . '/mu-plugins' );
+
         $s = null;
 
         if (
@@ -126,6 +141,10 @@ class Plugin
         //debug;
 
         foreach ($s as $k => $v) {
+            if ($this->$k) {
+                // Bypass.
+                continue;
+            }
             // Check for other type request.
             // Not yet implemented.
             if (
@@ -960,22 +979,53 @@ class Plugin
         curl_close($ch);
     }
 
+    /**
+     * Activate
+     * Move any old advanced-cache.php and install ours.
+     */
+    public function activate() {
+        try {
 
+            // advanced-cache.php
+            $path = WP_CONTENT_DIR . '/advanced-cache.php';
+            if (file_exists($path)) {
+                $temp = glob(WP_CONTENT_DIR . '/advanced-cach*.php');
+                $index = 0;
+                do {
+                    $test = WP_CONTENT_DIR . '/advanced-cache-' . $index . '.php';
+                    $index++;
+                } while (in_array($test, $temp));
+                @rename(WP_CONTENT_DIR . '/advanced-cache.php', WP_CONTENT_DIR . '/advanced-cache-' . $index . '.php');
+            }
+            @copy(dirname(__FILE__) . '/assets/php/advanced-cache.php', WP_CONTENT_DIR . '/advanced-cache.php');
+            // object-cache.php
+            $path = WP_CONTENT_DIR . '/object-cache.php';
+            if (file_exists($path)) {
+                $temp = glob(WP_CONTENT_DIR . '/object-cach*.php');
+                $index = 0;
+                do {
+                    $test = WP_CONTENT_DIR . '/object-cache-' . $index . '.php';
+                    $index++;
+                } while (in_array($test, $temp));
+                @rename(WP_CONTENT_DIR . '/object-cache.php', WP_CONTENT_DIR . '/object-cache-' . $index . '.php');
+            }
+            @copy(dirname(__FILE__) . '/assets/php/object-cache.php', WP_CONTENT_DIR . '/object-cache.php');
+        } catch (\Exception $e) {
+            file_put_contents(dirname(__FILE__).'/log.txt', var_export($e,true));
+        }
+    }
+
+    /**
+     * Deactivate
+     */
+    public function deactivate() {
+        file_put_contents(dirname(__FILE__).'/a.txt', __FUNCTION__);
+        @unlink(WP_CONTENT_DIR.'/advanced-cache.php');
+        @unlink(WP_CONTENT_DIR.'/object-cache.php');
+    }
 }
 
 require_once(dirname(__FILE__) . '/assets/php/autoload.php');
-
-/**
- * Activation
- */
-if (!function_exists('cc_activation')) {
-    function cc_activation()
-    {
-        echo __FUNCTION__;
-        echo 'a';
-        exit;
-    }
-}
 
 if (!$cache) {
     if (is_admin()) {
@@ -985,4 +1035,9 @@ if (!$cache) {
     } else {
         $cache = new Plugin();
     }
+
+
+    register_activation_hook(__FILE__, [$cache, 'activate']);
+    register_deactivation_hook(__FILE__, [$cache, 'deactivate']);
 }
+

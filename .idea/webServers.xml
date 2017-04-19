@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="469caa33-3106-470b-8afd-3a66252b60ee" name="mxmkmarquette" url="http://madmax.quebec">
+        <fileTransfer host="vm659.fcomet.com" port="21" rootFolder="/public_html/neufsvies/wp-content/" password="dfcbdfc4dfe6dfcbdfffdff7df98df81df9cdfe1df9fdffa" username="madmax">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
