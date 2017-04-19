@@ -47,7 +47,10 @@ Temporary Items
 .apdisk
 *.xml
 .idea/deployment.xml
+.idea/workspace.xml
 *.xml
+.idea/*
 
 # Config.php file
 plugins/crumbls_cache/config.php
+.idea/workspace.xml
