@@ -1035,9 +1035,10 @@ if (!$cache) {
     } else {
         $cache = new Plugin();
     }
-
-
-    register_activation_hook(__FILE__, [$cache, 'activate']);
-    register_deactivation_hook(__FILE__, [$cache, 'deactivate']);
+    
+    if (function_exists('wp_normalize_path')) {
+        register_activation_hook(__FILE__, [$cache, 'activate']);
+        register_deactivation_hook(__FILE__, [$cache, 'deactivate']);
+    }
 }
 
