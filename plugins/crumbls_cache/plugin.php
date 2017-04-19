@@ -39,6 +39,11 @@ class Plugin
             return;
         }
 
+
+//        global $wp_filter;
+
+//        add_action('activate_)
+
         // Handle initialization
         add_action('init', [$this, 'actionInit']);
 
@@ -152,6 +157,8 @@ class Plugin
      **/
     public function advancedCache()
     {
+        global $wpdb, $current_user;
+
         // Determine if we should load advanced cache.
         if (!$this->page) {
             $message = 'Page cache is disabled';
@@ -162,7 +169,6 @@ class Plugin
             return;
         }
 
-        global $wpdb, $current_user;
         if (preg_match('#/wp-(admin|login)#', $_SERVER['REQUEST_URI'])) {
             return;
         }
@@ -170,14 +176,6 @@ class Plugin
         if (array_key_exists('s', $_REQUEST)) {
             //return;
         }
-
-        if (array_key_exists('p', $_REQUEST) && is_numeric($_REQUEST['p'])) {
-            if (!isset($wpdb) || !$wpdb) {
-                //	echo 'a';
-            }
-            //       return;
-        }
-
 
         $this->tags = false;
         if (!defined('cache_key')) {
@@ -197,11 +195,29 @@ class Plugin
             if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) {
             } else if (true) {
                 $args['is_logged_in'] = 0;
-                if (!$current_user && $temp = preg_grep('#^wordpress_logged_in_#', array_keys($_COOKIE))) {
-                    $temp = array_values($temp);
-                    if (sizeof($temp) == 1) {
-                        // Look at username.
-                        $args['is_logged_in'] = 1;
+                /**
+                 * Check login cookie.
+                 * This needs reinforced down the road to prevent fake cookies to read.
+                 */
+                if (!$current_user) {
+                    if ($temp = preg_grep('#^wordpress_logged_in_#', array_keys($_COOKIE))) {
+                        $temp = array_values($temp);
+                        if (sizeof($temp) == 1) {
+                            // Look at username.
+                            $args['is_logged_in'] = 1;
+                        }
+                    } else if (array_key_exists('u', $_REQUEST) && is_numeric($_REQUEST['u'])) {
+                        /**
+                         * We temporarily ignore caching in this case.
+                         * Your site will probably never use this.
+                         * We use it as an automatic login for our aging subscriber age.
+                         * When a user enters via a link, they have a field that has a unique ID from
+                         * our mailer service.  That link will give them soft access, where they get
+                         * behind our paywall, but are unable to make purchases, changes, etc without
+                         * actually entering their password.
+                         */
+                        defined('DONOTCACHEPAGE') or define('DONOTCACHEPAGE', true);
+                        return;
                     }
                 }
             }
@@ -242,7 +258,7 @@ class Plugin
         }
 
         //ob_start(); // Start the output buffer
-        ob_start('ob_gzhandler') || ob_start();
+        ob_start();
 
         // Register shutdown function.
         register_shutdown_function(function () {
@@ -295,7 +311,8 @@ class Plugin
      * (B)rowse
      * Browse items in the object cache.
      **/
-    public function browse()
+    public
+    function browse()
     {
     }
 
@@ -303,7 +320,8 @@ class Plugin
      * (r)ead
      * Read an item from the object cache.
      **/
-    public function read($key)
+    public
+    function read($key)
     {
         global $wpdb;
 
@@ -331,7 +349,8 @@ class Plugin
      * (e)dit
      * Edit an item from the object cache.
      **/
-    public function edit($key, $value, $tags, $expires)
+    public
+    function edit($key, $value, $tags, $expires)
     {
         return $this->add($key, $value, $tags, $expires);
     }
@@ -340,7 +359,8 @@ class Plugin
      * (e)dit Decrease
      * Edit Decrease an item from the object cache.
      */
-    public function editDecrease($key, $value = 1, $tags = false)
+    public
+    function editDecrease($key, $value = 1, $tags = false)
     {
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
         if (!$context) {
@@ -372,7 +392,8 @@ class Plugin
      * (e)dit Increase
      * Edit Increase an item from the object cache.
      */
-    public function editIncrease($key, $value = 1, $tags = false)
+    public
+    function editIncrease($key, $value = 1, $tags = false)
     {
         $context = strpos($key, 'transient') > -1 ? $this->transient : $this->object;
         if (!$context) {
@@ -402,7 +423,8 @@ class Plugin
      * (a)dd
      * Add an item to the object cache.
      **/
-    public function add($key, $value, $tags = null, $expires = -1)
+    public
+    function add($key, $value, $tags = null, $expires = -1)
     {
         // Auto route
         // Determine which cache to use, quickly.
@@ -429,7 +451,8 @@ class Plugin
      * (d)elete
      * Delete from the object cache.
      **/
-    public function delete($key = null, $tags = null)
+    public
+    function delete($key = null, $tags = null)
     {
         if (!$key && !$tags) {
             // Nothing was passed.
@@ -464,7 +487,8 @@ class Plugin
     /**
      * Flush cache
      */
-    public function flush()
+    public
+    function flush()
     {
         if (!$this->page) {
             return;
@@ -475,7 +499,8 @@ class Plugin
     /**
      * Output statistics
      */
-    public function getStats()
+    public
+    function getStats()
     {
         if (!$this->page) {
             return;
@@ -486,12 +511,14 @@ class Plugin
     /**
      * Return cache instance.
      **/
-    public function getInstance()
+    public
+    function getInstance()
     {
         return $this->page;
     }
 
-    public function postPublish($ID, $post)
+    public
+    function postPublish($ID, $post)
     {
         // A function to perform actions when a post is published.
         if ($post->post_type != 'post') {
@@ -516,7 +543,8 @@ class Plugin
      * Save post handler.
      * Clear the cache and anywhere it may exist.
      **/
-    public function savePost($post_id, $post, $update = false)
+    public
+    function savePost($post_id, $post, $update = false)
     {
         global $post;
         // Must match our post types.
@@ -584,7 +612,8 @@ class Plugin
      * It lets us clear the cache easier.
      * @param $post
      */
-    public function actionThePost($post)
+    public
+    function actionThePost($post)
     {
         if (!is_main_query()) {
             return;
@@ -604,7 +633,8 @@ class Plugin
      * @param $comment_id
      * @param $status
      */
-    public function actionCommentPost($comment_id, $status)
+    public
+    function actionCommentPost($comment_id, $status)
     {
         // Not yet implemented.
     }
@@ -613,7 +643,8 @@ class Plugin
      * Handles pre_get_posts action.
      * We use this just to set our expiration time for archives.
      */
-    public function actionPreGetPosts($query)
+    public
+    function actionPreGetPosts($query)
     {
         if (!$query->is_main_query() || !$query->is_archive()) {
             return;
@@ -624,7 +655,8 @@ class Plugin
 
 
     // Add Toolbar Menus
-    public function adminToolbar()
+    public
+    function adminToolbar()
     {
         global $wp_admin_bar, $wp;
 
@@ -672,7 +704,8 @@ class Plugin
      * @param $new
      * @param $old
      */
-    public function optionUpdate($new, $old, $key)
+    public
+    function optionUpdate($new, $old, $key)
     {
         if ($key != 'crumbls_settings') {
             return $new;
@@ -766,7 +799,8 @@ class Plugin
      * Generate static configuration file.
      * @param null $in
      */
-    protected function generateConfig($in = null)
+    protected
+    function generateConfig($in = null)
     {
         if (!function_exists('get_option')) {
             return;
@@ -846,7 +880,8 @@ class Plugin
      * Get cache types
      * @return array
      */
-    protected function getTypes()
+    protected
+    function getTypes()
     {
         return ['page', 'object', 'transient'];
     }
@@ -854,7 +889,8 @@ class Plugin
     /**
      * Send anonymous usage statistics.
      */
-    private function _usageStatistics()
+    private
+    function _usageStatistics()
     {
         $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
@@ -912,11 +948,23 @@ class Plugin
 
 require_once(dirname(__FILE__) . '/assets/php/autoload.php');
 
-if (is_admin()) {
-    // No admin side yet.
-    require_once(dirname(__FILE__) . '/admin.php');
-    $cache = new Admin();
-} else {
-    $cache = new Plugin();
+/**
+ * Activation
+ */
+if (!function_exists('cc_activation')) {
+    function cc_activation()
+    {
+        echo __FUNCTION__;
+        echo 'a';
+        exit;
+    }
 }
-
+if (!$cache) {
+    if (is_admin()) {
+        // No admin side yet.
+        require_once(dirname(__FILE__) . '/admin.php');
+        $cache = new Admin();
+    } else {
+        $cache = new Plugin();
+    }
+}

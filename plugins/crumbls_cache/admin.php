@@ -22,9 +22,7 @@ class Admin extends Plugin
 
         add_action('admin_enqueue_scripts', [$this, 'actionAdminEnqueue']);
 
-
         add_action('admin_notices', [$this, 'adminNotices']);
-
     }
 
     /**
@@ -32,7 +30,6 @@ class Admin extends Plugin
      */
     public function actionAdminInit()
     {
-
         register_setting('crumblsCache', 'crumbls_settings');
 
         // All of these settings.
@@ -51,6 +48,9 @@ class Admin extends Plugin
             'crumbls_crumblsCache_general'
         );
 
+        // Check for advanced-cache.php and object-cache.php
+        // Not yet implemented.
+//        $this->_checkInstall();
     }
 
     public function actionAdminEnqueue()
@@ -160,6 +160,12 @@ class Admin extends Plugin
             strpos($_REQUEST['action'], 'clear') === 0
             &&
             method_exists($this, '_' . $_REQUEST['action'])
+            &&
+            array_key_exists('key', $_REQUEST)
+            &&
+            is_numeric($_REQUEST['key'])
+            &&
+            abs($_REQUEST['key'] - time()) < 5 // To not keep looping if you hit refresh.
         ) {
             $k = '_' . $_REQUEST['action'];
             call_user_func([$this, $k]);
@@ -175,11 +181,11 @@ class Admin extends Plugin
                 $tabs = $this->getTypes();
                 $supported = $this->getSupported();
                 $options = get_option('crumbls_settings');
-                foreach($tabs as $k) {
+                foreach ($tabs as $k) {
                     if ($this->$k) {
                         printf('<a href="%s" class="button">%s</a> ',
-                            admin_url('admin.php?page=cache&action=clear'.ucwords($k).'&key=' . time()),
-                            __('Clear '.$k.' Cache',__NAMESPACE__)
+                            admin_url('admin.php?page=cache&action=clear' . ucwords($k) . '&key=' . time()),
+                            __('Clear ' . $k . ' Cache', __NAMESPACE__)
                         );
                     }
                 }
@@ -226,6 +232,7 @@ class Admin extends Plugin
                             }
                         }
                         // Add inherit options.
+//                        print_r($supported);
                         // End add inherit options.
                         foreach ($supported as $k => $v) {
                             printf('<option value="%s"%s>%s</option>',
@@ -253,7 +260,14 @@ class Admin extends Plugin
                                 echo '</td>';
                             }
                         }
+
+                        // Allow extension
+                        if (method_exists($this, '_tab' . ucfirst($pane))) {
+                            call_user_func([$this, '_tab' . ucfirst($pane)], $ref);
+                        }
+
                         echo '</table>';
+
                         if ($this->$pane) {
                             $ref = $this->$pane;
                             if (method_exists($ref, 'getStats')) {
@@ -304,7 +318,7 @@ class Admin extends Plugin
         if (!$t) {
             return;
         }
-//        print_r($t);
+        print_r($t);
     }
 
     /**
@@ -343,6 +357,13 @@ class Admin extends Plugin
         return $this->clearCache($k);
     }
 
+    /**
+     * Clear transient cache
+     */
+    private function _clearAll() {
+        return $this->clearCache();
+    }
+
 
     /**
      * Clear cache
@@ -374,4 +395,131 @@ class Admin extends Plugin
 
     }
 
+    /**
+     * Show extra page tab options.
+     */
+    public function _tabPage($options)
+    {
+        ?>
+        <tr class="always-visible">
+            <th>
+                <?php _e('Minify HTML', __NAMESPACE__); ?>
+            </th>
+            <td><?php
+                $val = array_key_exists('minify_html', $options) && $options['minify_html'] ? ' checked' : '';
+                printf('<input type="checkbox" name="%s" id="%s"%s>',
+                    'crumbls_settings[page][minify_html]',
+                    'crumbls_settings_page_minify_html',
+                    $val
+                );
+                ?></td>
+        </tr>
+        <tr class="always-visible hidden">
+            <th>
+                <?php _e('Minify CSS', __NAMESPACE__); ?>
+            </th>
+            <td><?php
+                $val = array_key_exists('minify_css', $options) && $options['minify_css'] ? ' checked' : '';
+                printf('<input type="checkbox" name="%s" id="%s"%s>',
+                    'crumbls_settings[page][minify_css]',
+                    'crumbls_settings_page_minify_css',
+                    $val
+                );
+                ?></td>
+        </tr>
+        <tr class="always-visible hidden">
+            <th>
+                <?php _e('Minify Javascript', __NAMESPACE__); ?>
+            </th>
+            <td><?php
+                $val = array_key_exists('minify_js', $options) && $options['minify_js'] ? ' checked' : '';
+                printf('<input type="checkbox" name="%s" id="%s"%s>',
+                    'crumbls_settings[page][minify_js]',
+                    'crumbls_settings_page_minify_js',
+                    $val
+                );
+                ?></td>
+        </tr>
+        <?php
+    }
+
+    // Check for advanced-cache.php and object-cache.php
+    private function _checkInstall()
+    {
+        if (
+        !array_key_exists('PHP_SELF', $_SERVER)
+        ) {
+            return;
+        }
+        $basename = basename($_SERVER['PHP_SELF']);
+
+        if (!in_array($basename, [
+            'plugins.php',
+            'options-general.php'
+        ])
+        ) {
+            return;
+        }
+
+        if (
+            $basename == 'options-general.php'
+            &&
+            (
+                !array_key_exists('page', $_REQUEST)
+                ||
+                $_REQUEST['page'] != 'cache'
+            )
+        ) {
+            return false;
+        }
+
+        // Check it out.
+        if (
+            !file_exists(WP_CONTENT_DIR . '/advanced-cache.php')
+            ||
+            !file_exists(WP_CONTENT_DIR . '/object-cache.php')
+        ) {
+            // Error 1.
+            echo 'issue!';
+            exit;
+        } else {
+            $err = [
+                'advanced-cache' => file_exists(WP_CONTENT_DIR . '/advanced-cache.php') ? md5_file(WP_CONTENT_DIR . '/advanced-cache.php') : false,
+                'object-cache' => file_exists(WP_CONTENT_DIR . '/object-cache.php') ? md5_file(WP_CONTENT_DIR . '/object-cache.php') : false
+            ];
+            if ($err['advanced-cache'] == '940a1e658235ad5e749247fb59362528') {
+                unset($err['advanced-cache']);
+            }
+            if ($err['object-cache'] == '39e72bbd6b9707a744932c33b49ff135') {
+                unset($err['object-cache']);
+            }
+            if ($err) {
+                $t = get_option('crumbls_log');
+                if (!$t) {
+                    $t = [];
+                }
+                // Cleanup similar
+                $name = __FUNCTION__;
+                if ($rem = array_filter($t, function ($e) use ($name) {
+                    return strpos($e, $name);
+                })
+                ) {
+                    $t = array_diff_key($t, $rem);
+                }
+
+                // Clean bad logs.
+                foreach ($err as $k => $md5) {
+                    if ($md5 === false) {
+                        $t[] = '<div class="notice notice-error ' . __FUNCTION__ . '"><p>' . __(sprintf('Missing file: %s. Cache will not function correctly.', $k), __NAMESPACE__) . '</p></div>';
+                    } else {
+                        $t[] = '<div class="notice notice-error ' . __FUNCTION__ . '"><p>' . __(sprintf('Invalid checksum for %s. Cache will not function correctly.', $k), __NAMESPACE__) . '</p></div>';
+                    }
+                }
+
+                // Update for notice.
+                $t = array_unique(array_filter($t));
+                update_option('crumbls_log', $t);
+            }
+        }
+    }
 }

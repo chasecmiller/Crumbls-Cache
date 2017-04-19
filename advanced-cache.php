@@ -14,8 +14,8 @@ if (!file_exists($file)) {
 	return;
 }
 	
-require_once($file);
 if (!is_admin()) {
+	require_once($file);
 	$cache->advancedCache();
 }
 
