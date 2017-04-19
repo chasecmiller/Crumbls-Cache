@@ -99,6 +99,7 @@ class CacheManager
         $instance = crc32($driver . serialize($config));
         if (!isset(self::$instances[$instance])) {
             $badPracticeOmeter[$driver] = 1;
+            $config['ignoreSymfonyNotice'] = true;
             if (!$config['ignoreSymfonyNotice'] && interface_exists('Symfony\Component\HttpKernel\KernelInterface') && !class_exists('phpFastCache\Bundle\phpFastCacheBundle')) {
                 trigger_error('A Symfony Bundle to make the PhpFastCache integration more easier is now available here: https://github.com/PHPSocialNetwork/phpfastcache-bundle', E_USER_NOTICE);
             }

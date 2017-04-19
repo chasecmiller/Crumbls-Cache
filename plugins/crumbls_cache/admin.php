@@ -111,7 +111,13 @@ class Admin extends Plugin
                 $temp = $cm->getInstance($driver, []);
                 if (@$temp->driverCheck()) {
                     $d = new \stdClass();
-                    $d->name = __($cm->standardizeDriverName($driver), __NAMESPACE__);
+                    if (method_exists($temp, 'getName')) {
+                        $d->name = $temp->getName();
+                    } else {
+                        $d->name = $cm->standardizeDriverName($driver);
+                    }
+                    $d->name = __($d->name, __NAMESPACE__);
+
                     $d->fields = [];
                     $default = [];
                     if (method_exists($temp, 'getConfig')) {
@@ -165,7 +171,7 @@ class Admin extends Plugin
             &&
             is_numeric($_REQUEST['key'])
             &&
-            abs($_REQUEST['key'] - time()) < 5 // To not keep looping if you hit refresh.
+            abs($_REQUEST['key'] - time()) < 120 // To not keep looping if you hit refresh.
         ) {
             $k = '_' . $_REQUEST['action'];
             call_user_func([$this, $k]);
@@ -181,6 +187,12 @@ class Admin extends Plugin
                 $tabs = $this->getTypes();
                 $supported = $this->getSupported();
                 $options = get_option('crumbls_settings');
+                if (in_array('page', $tabs) && $this->page) {
+                    printf('<a href="%s" class="button">%s</a> ',
+                        admin_url('admin.php?page=cache&action=clearFrontpage&key=' . time()),
+                        __('Clear Frontpage', __NAMESPACE__)
+                    );
+                }
                 foreach ($tabs as $k) {
                     if ($this->$k) {
                         printf('<a href="%s" class="button">%s</a> ',
@@ -319,6 +331,18 @@ class Admin extends Plugin
             return;
         }
         print_r($t);
+    }
+
+    /**
+     * Clear frontpage
+     */
+    private function _clearFrontpage()
+    {
+        if (!$this->page) {
+            return;
+        }
+
+        return $this->page->deleteItemsByTag('/');
     }
 
     /**

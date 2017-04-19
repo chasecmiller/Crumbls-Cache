@@ -123,6 +123,7 @@ class Plugin
             && array_key_exists('type', $e)
             && $e['type'];
         });
+        //debug;
 
         foreach ($s as $k => $v) {
             // Check for other type request.
@@ -139,6 +140,13 @@ class Plugin
             }
         }
 
+        // Fallback section.
+        if (!$this->object) {
+            $this->object = CacheManager::getInstance('wpobjectcache', []);
+        }
+        if (!$this->transient) {
+            $this->object = CacheManager::getInstance('wpobjectcache', []);
+        }
     }
 
     /**
@@ -674,6 +682,15 @@ class Plugin
             'href' => admin_url('options-general.php?page=cache')
         ]);
 
+        if ($this->page) {
+            // Category, archive, etc?
+            $wp_admin_bar->add_menu([
+                'id' => 'crumbls_cache_frontpage',
+                'parent' => 'crumbls_cache',
+                'title' => __('Clear Frontpage', __NAMESPACE__),
+                'href' => admin_url('admin.php?page=cache&action=clearFrontpage&key=' . time())
+            ]);
+        }
 
         foreach ($this->getTypes() as $k) {
             if (!$k) {
@@ -959,6 +976,7 @@ if (!function_exists('cc_activation')) {
         exit;
     }
 }
+
 if (!$cache) {
     if (is_admin()) {
         // No admin side yet.

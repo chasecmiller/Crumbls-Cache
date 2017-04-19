@@ -84,7 +84,6 @@ trait StandardPsr6StructureTrait
         } else {
             throw new \InvalidArgumentException(sprintf('$key must be a string, got type "%s" instead.', gettype($key)));
         }
-
         return $this->itemInstances[ $key ];
     }
 

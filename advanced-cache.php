@@ -8,14 +8,16 @@ defined('ABSPATH') or exit(1);
 
 global $cache;
 
-$file = dirname(__FILE__).'/plugins/crumbls_cache/plugin.php';
+if (!$cache) {
+	$file = dirname(__FILE__).'/plugins/crumbls_cache/plugin.php';
 
-if (!file_exists($file)) {
-	return;
-}
-	
-if (!is_admin()) {
-	require_once($file);
-	$cache->advancedCache();
-}
+	if (!file_exists($file)) {
+		return;
+	}
 
+	if (!is_admin()) {
+		require_once($file);
+		$cache->advancedCache();
+	}
+
+}

@@ -98,7 +98,7 @@ trait PathSeekerTrait
 
                 /**
                  * In case there is no directory
-                 * writable including tye temporary
+                 * writable including type temporary
                  * one, we must throw an exception
                  */
                 if (!@file_exists($full_path) || !@is_writable($full_path)) {

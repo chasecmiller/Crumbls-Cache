@@ -6,14 +6,15 @@
 defined('ABSPATH') or exit(1);
 
 global $cache;
+if (!$cache) {
+	$file = dirname(__FILE__).'/plugins/crumbls_cache/plugin.php';
 
-$file = dirname(__FILE__).'/plugins/crumbls_cache/plugin.php';
+	if (!file_exists($file)) {
+		return;
+	}
 
-if (!file_exists($file)) {
-	return;
+	require_once($file);
 }
-	
-require_once($file);
 
 // Initialize
 
