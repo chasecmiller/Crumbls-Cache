@@ -44,22 +44,6 @@ class Driver extends DriverAbstract
      */
     public function __construct(array $config = [])
     {
-        if (
-            !array_key_exists('path', $config)
-        ||
-            !$config['path']
-        ) {
-            if (defined('WP_CONTENT_DIR')) {
-                $config['path'] = WP_CONTENT_DIR;
-            } else if (preg_match('#^(.*?\/wp-content)\/#i', __FILE__, $m)) {
-                $config['path'] = $m[0];
-            }
-            $config['path'] = rtrim($config['path'], '/').'/cache/crumbls/';
-        }
-
-//        print_r($config);
-//        exit;
-
         $this->setup($config);
 
         if (!$this->driverCheck()) {
@@ -72,8 +56,17 @@ class Driver extends DriverAbstract
      */
     public function driverCheck()
     {
-        return is_writable($this->getFileDir()) || @mkdir($this->getFileDir(), $this->setChmodAuto(), true);
+        $test = $this->getFileDir();
+        if (!is_dir($test)) {
+            @mkdir($test, 0777, true);
+        } else if (!is_writable($test)) {
+            exec("find ".$test." -type d -exec chmod 0777 {} +");
+        }
+        return is_writable($this->getFileDir())
+        ||
+        @mkdir($this->getFileDir(), $this->setChmodAuto(), true);
     }
+
 
     /**
      * @param \Psr\Cache\CacheItemInterface $item
@@ -85,11 +78,9 @@ class Driver extends DriverAbstract
         /**
          * Check for Cross-Driver type confusion
          */
-        if ($item instanceof Item) {
 
+        if ($item instanceof Item) {
             $file_path = $this->getFilePath($item->getKey());
-            echo $file_path;
-            exit;
             $data = $this->encode($this->driverPreWrap($item));
 
             $toWrite = true;
@@ -97,7 +88,7 @@ class Driver extends DriverAbstract
             /**
              * Skip if Existing Caching in Options
              */
-            if (isset($this->config[ 'skipExisting' ]) && $this->config[ 'skipExisting' ] == true && file_exists($file_path)) {
+            if (isset($this->config['skipExisting']) && $this->config['skipExisting'] == true && file_exists($file_path)) {
                 $content = $this->readfile($file_path);
                 $old = $this->decode($content);
                 $toWrite = false;
@@ -175,7 +166,7 @@ class Driver extends DriverAbstract
      */
     protected function driverClear()
     {
-        return (bool) Directory::rrmdir($this->getPath(true));
+        return (bool)Directory::rrmdir($this->getPath(true));
     }
 
     /**
@@ -255,9 +246,9 @@ class Driver extends DriverAbstract
         }
 
         $stat->setData(implode(', ', array_keys($this->itemInstances)))
-          ->setRawData([])
-          ->setSize(Directory::dirSize($path))
-          ->setInfo('Number of files used to build the cache: ' . Directory::getFileCount($path));
+            ->setRawData([])
+            ->setSize(Directory::dirSize($path))
+            ->setInfo('Number of files used to build the cache: ' . Directory::getFileCount($path));
 
         return $stat;
     }
@@ -268,7 +259,7 @@ class Driver extends DriverAbstract
      */
     public function getFileDir()
     {
-        return $this->getPath() . DIRECTORY_SEPARATOR;// . self::FILE_DIR;
+        return $this->getPath() . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -278,48 +269,55 @@ class Driver extends DriverAbstract
      */
     public function getPath($readonly = false)
     {
-        /**
-         * Get the base system temporary directory
-         */
-        $tmp_dir = rtrim(ini_get('upload_tmp_dir') ?: sys_get_temp_dir(), '\\/') . DIRECTORY_SEPARATOR . 'phpfastcache';
+        // Simplified.
+        $ret = null;
+        if (defined('WP_CONTENT_DIR')) {
+            $ret = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'cache';
+        } else {
+            $ret = dirname(__FILE__);
+            $ret = substr($ret, 0, strrpos($ret, '/plugins/crumbls_cache/'));
+            $ret .= DIRECTORY_SEPARATOR . 'cache';
+        }
 
-        /**
-         * Calculate the security key
-         */
-        $securityKey = array_key_exists('securityKey', $this->config) ? $this->config[ 'securityKey' ] : '';
-        if (!$securityKey || $securityKey === 'auto') {
-            if (function_exists('site_url')) {
-                $securityKey = site_url();
-            } else if (isset($_SERVER[ 'HTTP_HOST' ])) {
-                $securityKey = preg_replace('/^www./', '', strtolower(str_replace(':', '_', $_SERVER[ 'HTTP_HOST' ])));
-                $securityKey = preg_replace('/\W+$/', '', $securityKey);
+        $ret .= DIRECTORY_SEPARATOR . 'crumbls';
+
+
+        $append = null;
+        if (function_exists('site_url')) {
+            $append = preg_replace('#^https?:\/\/#', '', site_url());
+        } else if (array_key_exists('HTTP_HOST', $_SERVER)) {
+            $append = strtolower($_SERVER['HTTP_HOST']);
+        } else {
+            $append = ($this->isPHPModule() ? 'web' : 'cli');
+        }
+
+        if (!$append) {
+            $append = 'global';
+        }
+
+        if ($append !== 'cli') {
+            if ($this->is_ssl()) {
+                $append = 'https'.$append;
             } else {
-                $securityKey = ($this->isPHPModule() ? 'web' : 'cli');
+                $append = 'http'.$append;
             }
         }
-        if ($securityKey !== '') {
-            $securityKey .= '/';
+
+        $append = preg_replace('#[^A-Z]#i', '', $append);
+        $append = preg_replace('/\W+$/', '', $append);
+
+        $append = static::cleanFileName($append);
+        $ret .= DIRECTORY_SEPARATOR.$append;
+
+        $ret = Directory::getAbsolutePath($ret);
+
+        if (function_exists('is_admin') && is_admin()) {
+            if (!@file_exists($ret) || !@is_writable($ret)) {
+                throw new phpFastCacheDriverException('PLEASE CREATE OR CHMOD ' . $ret . ' - 0777 OR ANY WRITABLE PERMISSION!');
+            }
         }
-        $securityKey = static::cleanFileName($securityKey);
 
-        /**
-         * Extends the temporary directory
-         * with the security key and the driver name
-         */
-        $tmp_dir = rtrim($tmp_dir, '/') . DIRECTORY_SEPARATOR;
-        if (empty($this->config[ 'path' ]) || !is_string($this->config[ 'path' ])) {
-            $path = $tmp_dir;
-        } else {
-            $path = rtrim($this->config[ 'path' ], '/') . DIRECTORY_SEPARATOR;
-        }
-
-//        $path_suffix = $securityKey . DIRECTORY_SEPARATOR . $this->getDriverName();
-        $path_suffix = $securityKey;// . DIRECTORY_SEPARATOR . $this->getDriverName();
-        $full_path = Directory::getAbsolutePath($path . $path_suffix);
-
-        $full_path_tmp = Directory::getAbsolutePath($tmp_dir . $path_suffix);
-        $full_path_hash = md5($full_path);
-
+        return $ret;
 
         /**
          * In readonly mode we only attempt
@@ -328,24 +326,24 @@ class Driver extends DriverAbstract
          * return the temp dir
          */
         if ($readonly === true) {
-            if(!@file_exists($full_path) || !@is_writable($full_path)){
-                return $full_path_tmp;
+            if (!@file_exists($ret) || !@is_writable($full_path)) {
+                return false;
             }
-            return $full_path;
-        }else{
-            if (!isset($this->tmp[ $full_path_hash ]) || (!@file_exists($full_path) || !@is_writable($full_path))) {
+            return $ret;
+        } else {
+            if (!isset($t))
+            if (!isset($this->tmp[$full_path_hash]) || (!@file_exists($full_path) || !@is_writable($full_path))) {
                 if (!@file_exists($full_path)) {
-                    @mkdir($full_path, $this->setChmodAuto(), true);
-                }elseif (!@is_writable($full_path)) {
-                    if (!@chmod($full_path, $this->setChmodAuto()))
-                    {
+                    @mkdir($full_path, 0777, true);
+                } elseif (!@is_writable($full_path)) {
+                    if (!@chmod($full_path, $this->setChmodAuto())) {
                         /**
                          * Switch back to tmp dir
                          * again if the path is not writable
                          */
                         $full_path = $full_path_tmp;
                         if (!@file_exists($full_path)) {
-                            @mkdir($full_path, $this->setChmodAuto(), true);
+                            @mkdir($full_path, 0777, true);
                         }
                     }
                 }
@@ -358,12 +356,23 @@ class Driver extends DriverAbstract
                 if (!@file_exists($full_path) || !@is_writable($full_path)) {
                     throw new phpFastCacheDriverException('PLEASE CREATE OR CHMOD ' . $full_path . ' - 0777 OR ANY WRITABLE PERMISSION!');
                 }
-                $this->tmp[ $full_path_hash ] = $full_path;
-                $this->htaccessGen($full_path, array_key_exists('htaccess', $this->config) ? $this->config[ 'htaccess' ] : false);
+                $this->tmp[$full_path_hash] = $full_path;
+                $this->htaccessGen($full_path, array_key_exists('htaccess', $this->config) ? $this->config['htaccess'] : false);
             }
         }
         return realpath($full_path);
     }
 
+    public function is_ssl() {
+        if ( isset($_SERVER['HTTPS']) ) {
+            if ( 'on' == strtolower($_SERVER['HTTPS']) )
+                return true;
+            if ( '1' == $_SERVER['HTTPS'] )
+                return true;
+        } elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
+            return true;
+        }
+        return false;
+    }
 
 }

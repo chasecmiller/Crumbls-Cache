@@ -158,13 +158,14 @@ trait PathSeekerTrait
         $filename = $this->encodeFilename($keyword);
         $folder = substr($filename, 0, 2);
         $path = rtrim($path, '/') . '/' . $folder;
+
         /**
          * Skip Create Sub Folders;
          */
         if ($skip == false) {
             if (!file_exists($path)) {
                 if (@!mkdir($path, $this->setChmodAuto(), true)) {
-                    throw new phpFastCacheDriverException('PLEASE CHMOD ' . $this->getPath() . ' - ' . $this->setChmodAuto() . ' OR ANY WRITABLE PERMISSION!');
+//                    throw new phpFastCacheDriverException('PLEASE CHMOD ' . $this->getPath() . ' - ' . $this->setChmodAuto() . ' OR ANY WRITABLE PERMISSION!');
                 }
             }
         }
@@ -209,6 +210,7 @@ trait PathSeekerTrait
      */
     protected function htaccessGen($path, $create = true)
     {
+        return false;
         if ($create === true) {
             if (!is_writable($path)) {
                 try {
@@ -224,7 +226,6 @@ trait PathSeekerTrait
                 $html = "order deny, allow \r\n
 deny from all \r\n
 allow from 127.0.0.1";
-
                 $file = @fopen($path . '/.htaccess', 'w+');
                 if (!$file) {
                     throw new phpFastCacheDriverException('PLEASE CHMOD ' . $path . ' - 0777 OR ANY WRITABLE PERMISSION!');
