@@ -221,6 +221,8 @@ class Driver extends DriverAbstract
      */
     public static function getValidOptions()
     {
+        // Make this simpler by removing options.
+        return [];
         return ['path', 'default_chmod', 'securityKey', 'htaccess'];
     }
 

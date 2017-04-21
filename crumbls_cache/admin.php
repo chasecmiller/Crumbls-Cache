@@ -256,7 +256,6 @@ class Admin extends Plugin
                             );
                         }
                         echo '</select></td></tr>';
-
                         foreach ($supported as $k => $v) {
                             foreach ($v->fields as $ka => $vb) {
                                 printf('<tr class="%s"><th>%s</th><td>', $k, $vb->name);
@@ -426,6 +425,7 @@ class Admin extends Plugin
      */
     public function _tabPage($options)
     {
+        return;
         ?>
         <tr class="always-visible">
             <th>
