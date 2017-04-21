@@ -57,6 +57,9 @@ class Driver extends DriverAbstract
             $config['path'] = rtrim($config['path'], '/').'/cache/crumbls/';
         }
 
+//        print_r($config);
+//        exit;
+
         $this->setup($config);
 
         if (!$this->driverCheck()) {
@@ -83,7 +86,10 @@ class Driver extends DriverAbstract
          * Check for Cross-Driver type confusion
          */
         if ($item instanceof Item) {
+
             $file_path = $this->getFilePath($item->getKey());
+            echo $file_path;
+            exit;
             $data = $this->encode($this->driverPreWrap($item));
 
             $toWrite = true;
@@ -125,10 +131,13 @@ class Driver extends DriverAbstract
      */
     protected function driverRead(CacheItemInterface $item)
     {
+
+
         /**
          * Check for Cross-Driver type confusion
          */
         $file_path = $this->getFilePath($item->getKey());
+
         if (!file_exists($file_path)) {
             return null;
         }
@@ -220,7 +229,7 @@ class Driver extends DriverAbstract
      */
     public static function getRequiredOptions()
     {
-        return ['path'];
+        return [];
     }
 
     /********************
@@ -250,5 +259,109 @@ class Driver extends DriverAbstract
 
         return $stat;
     }
+
+    /**
+     * @return string
+     * @throws \phpFastCache\Exceptions\phpFastCacheCoreException
+     */
+    public function getFileDir()
+    {
+        return $this->getPath() . DIRECTORY_SEPARATOR;// . self::FILE_DIR;
+    }
+
+    /**
+     * @param bool $readonly
+     * @return string
+     * @throws phpFastCacheDriverException
+     */
+    public function getPath($readonly = false)
+    {
+        /**
+         * Get the base system temporary directory
+         */
+        $tmp_dir = rtrim(ini_get('upload_tmp_dir') ?: sys_get_temp_dir(), '\\/') . DIRECTORY_SEPARATOR . 'phpfastcache';
+
+        /**
+         * Calculate the security key
+         */
+        $securityKey = array_key_exists('securityKey', $this->config) ? $this->config[ 'securityKey' ] : '';
+        if (!$securityKey || $securityKey === 'auto') {
+            if (function_exists('site_url')) {
+                $securityKey = site_url();
+            } else if (isset($_SERVER[ 'HTTP_HOST' ])) {
+                $securityKey = preg_replace('/^www./', '', strtolower(str_replace(':', '_', $_SERVER[ 'HTTP_HOST' ])));
+                $securityKey = preg_replace('/\W+$/', '', $securityKey);
+            } else {
+                $securityKey = ($this->isPHPModule() ? 'web' : 'cli');
+            }
+        }
+        if ($securityKey !== '') {
+            $securityKey .= '/';
+        }
+        $securityKey = static::cleanFileName($securityKey);
+
+        /**
+         * Extends the temporary directory
+         * with the security key and the driver name
+         */
+        $tmp_dir = rtrim($tmp_dir, '/') . DIRECTORY_SEPARATOR;
+        if (empty($this->config[ 'path' ]) || !is_string($this->config[ 'path' ])) {
+            $path = $tmp_dir;
+        } else {
+            $path = rtrim($this->config[ 'path' ], '/') . DIRECTORY_SEPARATOR;
+        }
+
+//        $path_suffix = $securityKey . DIRECTORY_SEPARATOR . $this->getDriverName();
+        $path_suffix = $securityKey;// . DIRECTORY_SEPARATOR . $this->getDriverName();
+        $full_path = Directory::getAbsolutePath($path . $path_suffix);
+
+        $full_path_tmp = Directory::getAbsolutePath($tmp_dir . $path_suffix);
+        $full_path_hash = md5($full_path);
+
+
+        /**
+         * In readonly mode we only attempt
+         * to verify if the directory exists
+         * or not, if it does not then we
+         * return the temp dir
+         */
+        if ($readonly === true) {
+            if(!@file_exists($full_path) || !@is_writable($full_path)){
+                return $full_path_tmp;
+            }
+            return $full_path;
+        }else{
+            if (!isset($this->tmp[ $full_path_hash ]) || (!@file_exists($full_path) || !@is_writable($full_path))) {
+                if (!@file_exists($full_path)) {
+                    @mkdir($full_path, $this->setChmodAuto(), true);
+                }elseif (!@is_writable($full_path)) {
+                    if (!@chmod($full_path, $this->setChmodAuto()))
+                    {
+                        /**
+                         * Switch back to tmp dir
+                         * again if the path is not writable
+                         */
+                        $full_path = $full_path_tmp;
+                        if (!@file_exists($full_path)) {
+                            @mkdir($full_path, $this->setChmodAuto(), true);
+                        }
+                    }
+                }
+
+                /**
+                 * In case there is no directory
+                 * writable including type temporary
+                 * one, we must throw an exception
+                 */
+                if (!@file_exists($full_path) || !@is_writable($full_path)) {
+                    throw new phpFastCacheDriverException('PLEASE CREATE OR CHMOD ' . $full_path . ' - 0777 OR ANY WRITABLE PERMISSION!');
+                }
+                $this->tmp[ $full_path_hash ] = $full_path;
+                $this->htaccessGen($full_path, array_key_exists('htaccess', $this->config) ? $this->config[ 'htaccess' ] : false);
+            }
+        }
+        return realpath($full_path);
+    }
+
 
 }

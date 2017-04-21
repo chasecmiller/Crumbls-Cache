@@ -141,6 +141,8 @@ class Admin extends Plugin
                 }
             } catch (\phpFastCache\Exceptions\phpFastCacheDriverCheckException $e) {
                 continue;
+            } catch (\Exception $e) {
+                continue;
             }
         }
 
@@ -280,7 +282,7 @@ class Admin extends Plugin
 
                         echo '</table>';
 
-                        if ($this->$pane) {
+                        if ($this->$pane && false) {
                             $ref = $this->$pane;
                             if (method_exists($ref, 'getStats')) {
                                 printf('<h2>%s</h2>',
