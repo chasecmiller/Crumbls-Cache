@@ -299,6 +299,7 @@ class Plugin
             // This is being called on the front page.  It should not be.
             if (defined('DONOTCACHEPAGE') && DONOTCACHEPAGE) {
                 printf('<!-- %s -->', __('Cache Disabled By Constant', __NAMESPACE__));
+                return;
             }
 
             if (!defined('cache_key')) {
