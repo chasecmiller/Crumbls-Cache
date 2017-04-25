@@ -44,6 +44,16 @@ class Driver extends DriverAbstract
      */
     public function __construct(array $config = [])
     {
+        if (
+        !array_key_exists('path', $config)
+        ||
+        !$config['path']
+        ) {
+            $config['path'] = str_replace('\\', '/', __FILE__);
+            $config['path'] = substr($config['path'], 0, strrpos($config['path'], '/wp-content/')).DIRECTORY_SEPARATOR.'wp_content'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'crumbls'.DIRECTORY_SEPARATOR;
+        }
+        //$config['default_chmod'] = 755;
+
         $this->setup($config);
 
         if (!$this->driverCheck()) {
@@ -57,9 +67,12 @@ class Driver extends DriverAbstract
     public function driverCheck()
     {
         $test = $this->getFileDir();
+
         if (!is_dir($test)) {
             @mkdir($test, 0777, true);
         } else if (!is_writable($test)) {
+            echo 'b';
+            exit;
             exec("find ".$test." -type d -exec chmod 0777 {} +");
         }
         return is_writable($this->getFileDir())

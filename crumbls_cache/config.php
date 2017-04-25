@@ -9,18 +9,18 @@
     'path' => '/var/www/html/crumbls/wp-content/cache/crumbls/',
     'fallback' => false,
     'limited_memory_each_object' => 4096,
-    'compress_data' => false,
+    'compress_data' => true,
     'type' => 'files',
     'enabled' => true,
   ),
   'object' => 
   array (
-    'type' => false,
-    'enabled' => false,
+    'type' => 'wpobjectcache',
+    'enabled' => true,
   ),
   'transient' => 
   array (
-    'type' => false,
+    'type' => 'object',
     'enabled' => true,
   ),
 );

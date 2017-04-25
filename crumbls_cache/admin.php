@@ -425,7 +425,8 @@ class Admin extends Plugin
      */
     public function _tabPage($options)
     {
-        return;
+        print_r($options);
+//        return;
         ?>
         <tr class="always-visible">
             <th>
@@ -488,7 +489,8 @@ class Admin extends Plugin
         }
 
         if (
-            $basename == 'options-general.php'
+//            $basename == 'options-general.php'
+        true
             &&
             (
                 !array_key_exists('page', $_REQUEST)

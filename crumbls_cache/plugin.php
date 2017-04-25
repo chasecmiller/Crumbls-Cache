@@ -12,6 +12,7 @@
 
 namespace crumbls\plugins\fastcache;
 
+use Minify\HTML\Minify_HTML;
 use phpFastCache\CacheManager;
 
 defined('ABSPATH') or exit(1);
@@ -49,10 +50,8 @@ class Plugin
         // Handle initialization
         add_action('init', [$this, 'actionInit']);
 
-        // Updated.
-//        add_action('update_option', [$this, 'optionUpdate'], 10, 3);
         // Updated - We now trigger prior to updating the settings.
-        add_filter('pre_update_option_crumbls_settings', [$this, 'optionUpdate'], PHP_INT_MAX, 3);//"pre_update_option_{$option}", $value, $old_value, $option );
+        add_filter('pre_update_option_crumbls_settings', [$this, 'optionUpdate'], PHP_INT_MAX, 3);
 
         // Save/Insert post handler. - We ignore this now and just use it when a post is published.
         add_action('wp_insert_post', [$this, 'savePost'], PHP_INT_MAX - 1, 3);
@@ -101,8 +100,8 @@ class Plugin
 //            wp_plugin_directory_constants();
         }
 
-        defined('WP_PLUGIN_DIR') or define('WP_PLUGIN_DIR', rtrim(WP_CONTENT_DIR,'/').'/plugins');
-        defined('WPMP_PLUGIN_DIR') or define( 'WPMU_PLUGIN_DIR', rtrim(WP_CONTENT_DIR, '/') . '/mu-plugins' );
+        defined('WP_PLUGIN_DIR') or define('WP_PLUGIN_DIR', rtrim(WP_CONTENT_DIR, '/') . '/plugins');
+        defined('WPMP_PLUGIN_DIR') or define('WPMU_PLUGIN_DIR', rtrim(WP_CONTENT_DIR, '/') . '/mu-plugins');
 
         $s = null;
 
@@ -211,7 +210,8 @@ class Plugin
                 'paged',
                 'member',
                 's',
-                'feed'
+                'feed',
+                'date'
             ];
 
             $args = array_filter(array_intersect_key($_REQUEST, array_flip($allowed)));
@@ -292,7 +292,6 @@ class Plugin
             if (defined('DOING_CRON') && DOING_CRON) {
                 return;
             }
-
             if (is_admin()) {
                 return;
             }
@@ -300,7 +299,6 @@ class Plugin
             // This is being called on the front page.  It should not be.
             if (defined('DONOTCACHEPAGE') && DONOTCACHEPAGE) {
                 printf('<!-- %s -->', __('Cache Disabled By Constant', __NAMESPACE__));
-                return;
             }
 
             if (!defined('cache_key')) {
@@ -316,7 +314,21 @@ class Plugin
             printf('<!-- Cache created %s -->', date('Y-m-d H:i:s'));
 
             // If you want to compress html, this is the place.
-            $CachedString->set(trim(ob_get_contents()));
+            $s = trim(ob_get_contents());
+
+            $config = $this->page->getConfig();
+            if (
+                array_key_exists('minify_html', $config)
+                &&
+                $config['minify_html']
+            ) {
+//                    require_once(dirname(__FILE__).'/assets/php/Minify/HTML.php');
+                $a = new Minify_HTML();
+                $s = $a->minify($s);
+            }
+//            exit;
+
+            $CachedString->set($s);
 
             if ($this->tags) {
                 $CachedString->setTags($this->tags);
@@ -798,11 +810,22 @@ class Plugin
             } else if ($v['type']) {
                 try {
                     $config = array_intersect_key($v, array_flip(preg_grep('#^' . $v['type'] . '#', array_keys($v))));
+
                     if (!$config) {
-                        $v = [
-                            'type' => $v['type'],
-                            'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true
-                        ];
+                        if ($k == 'page') {
+                            $v = [
+                                'type' => $v['type'],
+                                'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true,
+                                'minify_html' => array_key_exists('minify_html', $v) && $v['minify_html'] == 'on' ? true : false,
+                                'minify_css' => array_key_exists('minify_css', $v) && $v['minify_css'] == 'on' ? true : false,
+                                'minify_js' => array_key_exists('minify_js', $v) && $v['minify_js'] = 'on' ? true : false
+                            ];
+                        } else {
+                            $v = [
+                                'type' => $v['type'],
+                                'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true
+                            ];
+                        }
                     } else {
                         $i = strlen($v['type']) + 1;
                         foreach ($config as $ka => $va) {
@@ -811,6 +834,7 @@ class Plugin
                         }
 
                         $temp = $cm->getInstance($v['type'], $config);
+
                         foreach ($config as $ka => $va) {
                             if (!$temp->isValidOption($ka, $va)) {
                                 $v['enabled'] = false;
@@ -871,10 +895,20 @@ class Plugin
                 try {
                     $config = array_intersect_key($v, array_flip(preg_grep('#^' . $v['type'] . '#', array_keys($v))));
                     if (!$config) {
-                        $v = [
-                            'type' => $v['type'],
-                            'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true
-                        ];
+                        if ($k == 'page') {
+                            $v = [
+                                'type' => $v['type'],
+                                'enabled' => array_key_exists('enabled', $v) ? (bool)$v['enabled'] : true,
+                                'minify_html' => array_key_exists('minify_html', $v) ? (bool)$v['minify_html'] : false,
+                                'minify_css' => array_key_exists('minify_css', $v) ? (bool)$v['minify_css'] : false,
+                                'minify_js' => array_key_exists('minify_js', $v) ? (bool)$v['minify_js'] : false
+                            ];
+                        } else {
+                            $v = [
+                                'type' => $v['type'],
+                                'enabled' => array_key_exists('enabled', $v) ? $v['enabled'] : true
+                            ];
+                        }
                     } else {
                         $i = strlen($v['type']) + 1;
                         foreach ($config as $ka => $va) {
@@ -901,6 +935,7 @@ class Plugin
                 }
             }
         }
+
         try {
             file_put_contents(dirname(__FILE__) . '/config.php', '<?php return ' . var_export($in, true) . ';');
             if (!array_key_exists('usage_statistics', $in) || $in['usage_statistics']) {
@@ -983,7 +1018,8 @@ class Plugin
      * Activate
      * Move any old advanced-cache.php and install ours.
      */
-    public function activate() {
+    public function activate()
+    {
         try {
 
             // advanced-cache.php
@@ -1011,17 +1047,18 @@ class Plugin
             }
             @copy(dirname(__FILE__) . '/assets/php/object-cache.php', WP_CONTENT_DIR . '/object-cache.php');
         } catch (\Exception $e) {
-            file_put_contents(dirname(__FILE__).'/log.txt', var_export($e,true));
+            file_put_contents(dirname(__FILE__) . '/log.txt', var_export($e, true));
         }
     }
 
     /**
      * Deactivate
      */
-    public function deactivate() {
-        file_put_contents(dirname(__FILE__).'/a.txt', __FUNCTION__);
-        @unlink(WP_CONTENT_DIR.'/advanced-cache.php');
-        @unlink(WP_CONTENT_DIR.'/object-cache.php');
+    public function deactivate()
+    {
+        file_put_contents(dirname(__FILE__) . '/a.txt', __FUNCTION__);
+        @unlink(WP_CONTENT_DIR . '/advanced-cache.php');
+        @unlink(WP_CONTENT_DIR . '/object-cache.php');
     }
 }
 
